@@ -247,6 +247,23 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
   const weekAvailability = availability.filter((a: any) => a.week_starting === weekStart && a.available)
 
+
+  const getAvail = (slot: any) => {
+    const startH = parseInt((slot.start || '08:00').split(':')[0])
+    const endH = slot.end === '00:00' ? 24 : parseInt((slot.end || '23:00').split(':')[0])
+    const staffWithAvail = new Set<string>()
+    weekAvailability.forEach((a: any) => {
+      if (a.slot_date === slot.date) {
+        const match = a.slot_key.match(/_h(\d+)$/)
+        if (match) {
+          const hour = parseInt(match[1])
+          if (hour >= startH && hour < endH) staffWithAvail.add(a.staff_id)
+        }
+      }
+    })
+    return Array.from(staffWithAvail)
+  }
+
   const generateSchedule = async () => {
     setGenerating(true)
     const monday = new Date(weekStart + 'T00:00:00')
@@ -272,22 +289,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     const assignCount: Record<string,number> = {}
     activeStaff.forEach((s: any) => { assignCount[s.id] = 0 })
 
-    const getAvail = (slot: any) => {
-      // slot has start/end times, check which staff have availability covering those hours
-      const startH = parseInt((slot.start || '08:00').split(':')[0])
-      const endH = slot.end === '00:00' ? 24 : parseInt((slot.end || '23:00').split(':')[0])
-      const staffWithAvail = new Set<string>()
-      weekAvailability.forEach((a: any) => {
-        if (a.slot_date === slot.date) {
-          const match = a.slot_key.match(/_h(\d+)$/)
-          if (match) {
-            const hour = parseInt(match[1])
-            if (hour >= startH && hour < endH) staffWithAvail.add(a.staff_id)
-          }
-        }
-      })
-      return Array.from(staffWithAvail)
-    }
+    // getAvail defined at component level
     const supRoles = ['supervisor_floor','supervisor_bar']
     const floorRoles = ['floor','supervisor_floor']
     const barRoles = ['bar','supervisor_bar']
