@@ -1,4 +1,7 @@
-import { createClient } from "@/lib/supabase-server"
+﻿const fs = require("fs");
+
+// Write layout with inline style - guaranteed to work
+const layout = `import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/layout/sidebar"
 
@@ -19,4 +22,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </main>
     </div>
   )
-}
+}`;
+
+fs.writeFileSync("src/app/(dashboard)/layout.tsx", layout, "utf8");
+console.log("Done");
