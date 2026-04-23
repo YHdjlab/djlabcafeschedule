@@ -275,128 +275,119 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     const supRoles = ['supervisor_floor','supervisor_bar']
     const floorRoles = ['floor','supervisor_floor']
     const barRoles = ['bar','supervisor_bar']
-    const assignCount: Record<string,number> = {}
-    activeStaff.forEach((s: any) => { assignCount[s.id] = 0 })
-    const byLeast = (ids: string[]) => [...ids].sort((a: any, b: any) => (assignCount[a]||0) - (assignCount[b]||0))
 
-    // For each staff member, find their available hours per day
-    const getStaffHoursForDay = (staffId: string, dateStr: string) => {
+    // Get actual available hours for a staff member on a date
+    const getStaffHours = (staffId: string, dateStr: string) => {
       const hours = weekAvailability
         .filter((a: any) => a.staff_id === staffId && a.slot_date === dateStr)
         .map((a: any) => { const m = a.slot_key.match(/_h(\d+)$/); return m ? parseInt(m[1]) : -1 })
         .filter((h: number) => h >= 0)
         .sort((a: number, b: number) => a - b)
-      return hours
-    }
-
-    const getStaffRange = (staffId: string, dateStr: string) => {
-      const hours = getStaffHoursForDay(staffId, dateStr)
       if (!hours.length) return null
-      return { start: hours[0], end: hours[hours.length - 1] + 1, hours }
+      return { startH: hours[0], endH: hours[hours.length - 1] + 1, totalH: hours[hours.length - 1] + 1 - hours[0], hours }
     }
 
-    // For a slot time range, get staff available for ALL hours in that range
-    const getAvailForRange = (dateStr: string, startH: number, endH: number) => {
-      const staffWithAvail = new Set<string>()
-      weekAvailability.forEach((a: any) => {
-        if (a.slot_date === dateStr) {
-          const match = a.slot_key.match(/_h(\d+)$/)
-          if (match) {
-            const hour = parseInt(match[1])
-            if (hour >= startH && hour < endH) staffWithAvail.add(a.staff_id)
-          }
-        }
-      })
-      // Only include staff available for majority of hours (at least half)
-      const rangeHours = endH - startH
-      return Array.from(staffWithAvail).filter(sid => {
-        const staffHours = getStaffHoursForDay(sid, dateStr).filter((h: number) => h >= startH && h < endH)
-        return staffHours.length >= Math.ceil(rangeHours * 0.5)
-      })
+    // Get all staff available on a date (have at least 1 hour)
+    const getAvailableStaff = (dateStr: string) => {
+      const staffSet = new Set<string>()
+      weekAvailability.filter((a: any) => a.slot_date === dateStr).forEach((a: any) => staffSet.add(a.staff_id))
+      return Array.from(staffSet)
     }
 
-    const slots: any[] = []
+    // Determine if a staff member covers rush hours on a given day
+    const coversRush = (staffId: string, dateStr: string, isWeekend: boolean) => {
+      if (isWeekend) return true
+      const info = getStaffHours(staffId, dateStr)
+      if (!info) return false
+      return info.hours.some((h: number) => h >= rushStartH && h < rushEndH)
+    }
+
+    const assignCount: Record<string,number> = {}
+    activeStaff.forEach((s: any) => { assignCount[s.id] = 0 })
+    const byLeast = (ids: string[]) => [...ids].sort((a: string, b: string) => (assignCount[a]||0) - (assignCount[b]||0))
+
+    const built: any[] = []
+
     DAYS.forEach((day, i) => {
       const date = addDays(monday, i)
       const dateStr = format(date, 'yyyy-MM-dd')
       const isWeekend = i >= 5
+      const availStaff = getAvailableStaff(dateStr)
+      if (!availStaff.length) return
 
-      if (isWeekend) {
-        // Weekend: one full rush day
-        slots.push({
-          key: day + '_full', date: dateStr, day, type: 'rush',
-          start: '08:00', end: '00:00',
-          startH: 8, endH: 24,
-          label: day + ' Full Day'
-        })
-      } else {
-        // Weekday: off-rush morning, rush, off-rush evening
-        // Only create a slot if there's availability in that window
-        const morningAvail = getAvailForRange(dateStr, 8, rushStartH)
-        const rushAvail = getAvailForRange(dateStr, rushStartH, rushEndH)
-        const eveningAvail = getAvailForRange(dateStr, rushEndH, 24)
+      // Separate by role
+      const availSups = byLeast(availStaff.filter((id: string) => supRoles.includes(STAFF_MAP[id]?.role)))
+      const availBars = byLeast(availStaff.filter((id: string) => barRoles.includes(STAFF_MAP[id]?.role)))
+      const availFloors = byLeast(availStaff.filter((id: string) => floorRoles.includes(STAFF_MAP[id]?.role)))
 
-        if (morningAvail.length > 0) {
-          slots.push({ key: day + '_morning', date: dateStr, day, type: 'off-rush', start: '08:00', end: rushStartH + ':00', startH: 8, endH: rushStartH, label: day + ' Morning' })
-        }
-        if (rushAvail.length > 0) {
-          slots.push({ key: day + '_rush', date: dateStr, day, type: 'rush', start: rushStartH + ':00', end: rushEndH + ':00', startH: rushStartH, endH: rushEndH, label: day + ' Rush' })
-        }
-        if (eveningAvail.length > 0) {
-          slots.push({ key: day + '_evening', date: dateStr, day, type: 'off-rush', start: rushEndH + ':00', end: '00:00', startH: rushEndH, endH: 24, label: day + ' Evening' })
-        }
-      }
-    })
+      // For rush coverage - prefer staff who cover rush hours
+      const rushSups = byLeast(availSups.filter((id: string) => coversRush(id, dateStr, isWeekend)))
+      const rushBars = byLeast(availBars.filter((id: string) => coversRush(id, dateStr, isWeekend)))
+      const rushFloors = byLeast(availFloors.filter((id: string) => coversRush(id, dateStr, isWeekend)))
 
-    const built = slots.map((slot: any) => {
-      const avail = getAvailForRange(slot.date, slot.startH, slot.endH)
-      const sups = byLeast(avail.filter((id: string) => supRoles.includes(STAFF_MAP[id]?.role)))
-      const bars = byLeast(avail.filter((id: string) => barRoles.includes(STAFF_MAP[id]?.role)))
-      const floors = byLeast(avail.filter((id: string) => floorRoles.includes(STAFF_MAP[id]?.role)))
+      // Assign supervisor (prefer rush coverage)
+      const supervisor_id = (rushSups[0] || availSups[0]) || null
+      if (supervisor_id) assignCount[supervisor_id] = (assignCount[supervisor_id]||0) + 1
+
+      // Assign bar (exclude supervisor)
+      const barPool = byLeast(availBars.filter((id: string) => id !== supervisor_id))
+      const rushBarPool = byLeast(rushBars.filter((id: string) => id !== supervisor_id))
+      const bar_staff_id = (rushBarPool[0] || barPool[0]) || null
+      if (bar_staff_id) assignCount[bar_staff_id] = (assignCount[bar_staff_id]||0) + 1
+
+      // Assign floor 1
+      const floorPool = byLeast(availFloors.filter((id: string) => id !== supervisor_id && id !== bar_staff_id))
+      const rushFloorPool = byLeast(rushFloors.filter((id: string) => id !== supervisor_id && id !== bar_staff_id))
+      const floor_staff1_id = (rushFloorPool[0] || floorPool[0]) || null
+      if (floor_staff1_id) assignCount[floor_staff1_id] = (assignCount[floor_staff1_id]||0) + 1
+
+      // Assign floor 2 (rush requires 2 floor staff)
+      const floor2Pool = byLeast(floorPool.filter((id: string) => id !== floor_staff1_id))
+      const floor_staff2_id = floor2Pool[0] || null
+      if (floor_staff2_id) assignCount[floor_staff2_id] = (assignCount[floor_staff2_id]||0) + 1
+
+      // Build issues
       const issues: string[] = []
-
-      let supervisor_id = sups[0] || null
       if (!supervisor_id) issues.push('No supervisor available')
-      else assignCount[supervisor_id] = (assignCount[supervisor_id]||0) + 1
-
-      const barCandidates = bars.filter((id: string) => id !== supervisor_id)
-      let bar_staff_id = barCandidates[0] || null
       if (!bar_staff_id) issues.push('No bar staff available')
-      else assignCount[bar_staff_id] = (assignCount[bar_staff_id]||0) + 1
-
-      const floorCandidates = floors.filter((id: string) => id !== supervisor_id && id !== bar_staff_id)
-      let floor_staff1_id = floorCandidates[0] || null
       if (!floor_staff1_id) issues.push('No floor staff available')
-      else assignCount[floor_staff1_id] = (assignCount[floor_staff1_id]||0) + 1
+      if (!floor_staff2_id && isWeekend) issues.push('Need 2nd floor for rush day')
 
-      let floor_staff2_id = null
-      if (slot.type === 'rush') {
-        const f2 = floorCandidates.filter((id: string) => id !== floor_staff1_id)[0] || null
-        if (!f2) issues.push('Need 2nd floor for rush')
-        else { floor_staff2_id = f2; assignCount[f2] = (assignCount[f2]||0) + 1 }
-      }
+      // Get actual hours for each assigned person
+      const getInfo = (id: string | null) => id ? getStaffHours(id, dateStr) : null
+      const supInfo = getInfo(supervisor_id)
+      const barInfo = getInfo(bar_staff_id)
+      const floor1Info = getInfo(floor_staff1_id)
+      const floor2Info = getInfo(floor_staff2_id)
 
-      // Calculate actual hours per assigned staff
-      const getActualHours = (staffId: string | null) => {
-        if (!staffId) return null
-        const range = getStaffRange(staffId, slot.date)
-        if (!range) return null
-        const actualStart = Math.max(range.start, slot.startH)
-        const actualEnd = Math.min(range.end, slot.endH)
-        return { start: actualStart, end: actualEnd, hours: actualEnd - actualStart }
-      }
+      // Calculate overall shift start/end for the day
+      const allInfos = [supInfo, barInfo, floor1Info, floor2Info].filter(Boolean)
+      const dayStart = allInfos.length ? Math.min(...allInfos.map((x: any) => x.startH)) : 8
+      const dayEnd = allInfos.length ? Math.max(...allInfos.map((x: any) => x.endH)) : 24
 
-      return {
-        ...slot,
-        supervisor_id, bar_staff_id, floor_staff1_id, floor_staff2_id, issues,
-        status: issues.length ? 'flagged' : 'draft',
-        actualHours: {
-          supervisor: getActualHours(supervisor_id),
-          bar: getActualHours(bar_staff_id),
-          floor1: getActualHours(floor_staff1_id),
-          floor2: getActualHours(floor_staff2_id),
-        }
-      }
+      const fmtH = (h: number) => { if (h === 0 || h === 24) return '12am'; if (h < 12) return h + 'am'; if (h === 12) return '12pm'; return (h-12) + 'pm' }
+
+      built.push({
+        key: day + '_day',
+        date: dateStr,
+        day,
+        label: day,
+        type: isWeekend ? 'rush' : 'mixed',
+        start: dayStart + ':00',
+        end: dayEnd === 24 ? '00:00' : dayEnd + ':00',
+        startH: dayStart,
+        endH: dayEnd,
+        supervisor_id, bar_staff_id, floor_staff1_id, floor_staff2_id,
+        issues,
+        staff: [
+          supervisor_id && { id: supervisor_id, role: 'Supervisor', info: supInfo },
+          bar_staff_id && { id: bar_staff_id, role: 'Bar', info: barInfo },
+          floor_staff1_id && { id: floor_staff1_id, role: 'Floor', info: floor1Info },
+          floor_staff2_id && { id: floor_staff2_id, role: 'Floor', info: floor2Info },
+        ].filter(Boolean),
+        rushStartH, rushEndH, isWeekend, fmtH,
+        status: issues.length ? 'flagged' : 'draft'
+      })
     })
 
     setGeneratedSlots(built)
@@ -495,96 +486,116 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       )}
 
       {generatedSlots.length > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-[#323232]">Generated Schedule Preview</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use dropdowns to swap staff.</p>
+              <h3 className="font-semibold text-[#323232]">Schedule Preview</h3>
+              <p className="text-xs text-gray-400 mt-0.5">Based on actual availability. Swap staff using dropdowns.</p>
             </div>
-            <Button size="sm" onClick={saveSchedule} loading={saving}>Save and Submit</Button>
+            <button onClick={saveSchedule} disabled={saving}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#FF6357] text-white text-sm font-semibold hover:bg-[#e5554a] transition-all disabled:opacity-50">
+              {saving ? 'Saving...' : 'Save and Submit'}
+            </button>
           </div>
-          {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => {
-            const daySlots = generatedSlots.filter((s: any) => s.day === day)
-            if (!daySlots.length) return null
-            const issues = [...new Set(daySlots.flatMap((s: any) => s.issues || []))]
-            const isWeekend = day === 'Saturday' || day === 'Sunday'
-            const ft = (t: string) => { if (t === '00:00') return '12am'; const h = parseInt(t.split(':')[0]); if (h < 12) return h + 'am'; if (h === 12) return '12pm'; return (h-12) + 'pm' }
+          {generatedSlots.map((slot: any) => {
+            const isWeekend = slot.isWeekend
+            const fmtH = (h: number) => { if (h === 0 || h === 24) return '12am'; if (h < 12) return h + 'am'; if (h === 12) return '12pm'; return (h-12) + 'pm' }
+            const slotAvail = (() => {
+              const staffSet = new Set<string>()
+              weekAvailability.filter((a: any) => a.slot_date === slot.date).forEach((a: any) => staffSet.add(a.staff_id))
+              return Array.from(staffSet)
+            })()
             return (
-              <div key={day} className={cn('bg-white rounded-2xl border overflow-hidden', issues.length ? 'border-red-200' : 'border-black/5')}>
-                <div className={cn('px-4 py-3 flex items-center justify-between', issues.length ? 'bg-red-50' : isWeekend ? 'bg-orange-50' : 'bg-[#F7F0E8]')}>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-sm text-[#323232]">{day}</span>
-                    <span className="text-xs text-gray-400">{daySlots[0]?.date}</span>
+              <div key={slot.key} className={cn('bg-white rounded-2xl border overflow-hidden', slot.issues?.length ? 'border-red-200' : 'border-black/5')}>
+                {/* Day header */}
+                <div className={cn('px-5 py-3 flex items-center justify-between', slot.issues?.length ? 'bg-red-50' : isWeekend ? 'bg-orange-50' : 'bg-[#F7F0E8]')}>
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <p className="font-bold text-[#323232]">{slot.day}</p>
+                      <p className="text-xs text-gray-400">{slot.date}</p>
+                    </div>
+                    {isWeekend && <span className="text-xs px-2 py-0.5 rounded-full bg-orange-200 text-orange-700 font-medium">Full Rush Day</span>}
                   </div>
-                  <span className="text-xs text-gray-500">{daySlots.length} shift{daySlots.length > 1 ? 's' : ''}</span>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-[#323232]">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
+                    <p className="text-xs text-gray-400">{slot.staff?.length || 0} staff assigned</p>
+                  </div>
                 </div>
+                {/* Rush band indicator for weekdays */}
+                {!isWeekend && (
+                  <div className="px-5 py-1.5 bg-white border-b border-black/5 flex items-center gap-2 text-xs text-gray-400">
+                    <div className="flex-1 h-1.5 rounded-full bg-blue-100 relative overflow-hidden">
+                      <div className="absolute h-full bg-orange-300 rounded-full"
+                        style={{left: ((slot.rushStartH - 8) / 16 * 100) + '%', width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%'}}/>
+                    </div>
+                    <span className="whitespace-nowrap">Rush {fmtH(slot.rushStartH)}-{fmtH(slot.rushEndH)}</span>
+                  </div>
+                )}
+                {/* Staff rows */}
                 <div className="divide-y divide-black/5">
-                  {daySlots.map((slot: any) => {
-                    const assigned = [
-                      slot.supervisor_id && { id: slot.supervisor_id, role: 'Supervisor', field: 'supervisor_id', eligibleRoles: ['supervisor_floor','supervisor_bar'] },
-                      slot.bar_staff_id && { id: slot.bar_staff_id, role: 'Bar', field: 'bar_staff_id', eligibleRoles: ['bar','supervisor_bar'] },
-                      slot.floor_staff1_id && { id: slot.floor_staff1_id, role: 'Floor', field: 'floor_staff1_id', eligibleRoles: ['floor','supervisor_floor'] },
-                      slot.floor_staff2_id && { id: slot.floor_staff2_id, role: 'Floor 2', field: 'floor_staff2_id', eligibleRoles: ['floor','supervisor_floor'] },
-                    ].filter(Boolean)
-                    const slotAvail = getAvail(slot)
+                  {(slot.staff || []).map((member: any) => {
+                    const s = STAFF_MAP[member.id]
+                    if (!s) return null
+                    const info = member.info
+                    const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-purple-500' : 'bg-green-500'
+                    const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : 'text-green-600'
+                    const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar'] : member.role === 'Bar' ? ['bar','supervisor_bar'] : ['floor','supervisor_floor']
+                    const fieldName = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
+                    const alts = slotAvail.filter((sid: string) =>
+                      sid !== member.id &&
+                      eligibleRoles.includes(STAFF_MAP[sid]?.role) &&
+                      sid !== slot.supervisor_id &&
+                      sid !== slot.bar_staff_id &&
+                      (fieldName === 'floor_staff1_id' || sid !== slot.floor_staff1_id) &&
+                      (fieldName === 'floor_staff2_id' || sid !== slot.floor_staff2_id)
+                    )
                     return (
-                      <div key={slot.key} className="px-4 py-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-[#323232]">{slot.label}</span>
-                            <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', slot.type === 'rush' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600')}>{slot.type}</span>
+                      <div key={member.id} className="px-5 py-3 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
+                            {s.full_name?.charAt(0)}
                           </div>
-                          <span className="text-xs font-semibold text-[#323232] bg-[#F7F0E8] px-2 py-1 rounded-lg">{ft(slot.start)} - {ft(slot.end)}</span>
+                          <div>
+                            <p className="text-sm font-semibold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
+                            <p className={cn("text-xs font-medium", roleTextColor)}>{member.role}</p>
+                          </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          {assigned.map((a: any) => {
-                            const current = STAFF_MAP[a.id]
-                            const alternatives = slotAvail.filter((sid: string) =>
-                              sid !== a.id && a.eligibleRoles.includes(STAFF_MAP[sid]?.role) &&
-                              sid !== slot.supervisor_id && sid !== slot.bar_staff_id &&
-                              (a.field === 'floor_staff1_id' || sid !== slot.floor_staff1_id) &&
-                              (a.field === 'floor_staff2_id' || sid !== slot.floor_staff2_id)
-                            )
-                            return (
-                              <div key={a.field} className="flex items-center gap-2 p-2.5 rounded-xl bg-[#F7F0E8] border border-black/5">
-                                <div className={cn("w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-white text-xs font-bold", a.role === 'Supervisor' ? "bg-blue-500" : a.role === 'Bar' ? "bg-purple-500" : "bg-green-500")}>
-                                  {current?.full_name?.charAt(0) || '?'}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-bold text-[#323232] truncate">{current?.full_name?.split(' ')[0] || 'Unassigned'}</p>
-                                  <p className={cn("text-xs font-medium", a.role === 'Supervisor' ? "text-blue-500" : a.role === 'Bar' ? "text-purple-500" : "text-green-600")}>{a.role}</p>
-                                </div>
-                                {alternatives.length > 0 && (
-                                  <select
-                                    value=""
-                                    onChange={e => {
-                                      if (!e.target.value) return
-                                      setGeneratedSlots(prev => prev.map((gs: any) =>
-                                        gs.key === slot.key ? { ...gs, [a.field]: e.target.value } : gs
-                                      ))
-                                    }}
-                                    className="text-xs border border-[#FF6357]/30 rounded-lg px-1.5 py-1 bg-white text-[#FF6357] cursor-pointer font-medium hover:border-[#FF6357]"
-                                  >
-                                    <option value="">Swap</option>
-                                    {alternatives.map((sid: string) => (
-                                      <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>
-                                    ))}
-                                  </select>
-                                )}
-                              </div>
-                            )
-                          })}
+                        <div className="flex items-center gap-3">
+                          {info ? (
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-[#323232]">{fmtH(info.startH)} - {fmtH(info.endH)}</p>
+                              <p className="text-xs text-[#FF6357] font-medium">{info.totalH}h</p>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-gray-400">Hours unknown</p>
+                          )}
+                          {alts.length > 0 && (
+                            <select value="" onChange={e => {
+                              if (!e.target.value) return
+                              const newId = e.target.value
+                              setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
+                                if (gs.key !== slot.key) return gs
+                                const updated = { ...gs, [fieldName]: newId }
+                                const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, id: newId, info: null } : m)
+                                return { ...updated, staff: newStaff }
+                              }))
+                            }}
+                              className="text-xs border border-[#FF6357]/40 rounded-lg px-2 py-1 bg-white text-[#FF6357] cursor-pointer font-medium">
+                              <option value="">Swap</option>
+                              {alts.map((sid: string) => (
+                                <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>
+                              ))}
+                            </select>
+                          )}
                         </div>
-                        {slot.issues?.length > 0 && (
-                          <p className="text-xs text-red-500 mt-2">{slot.issues.join(' · ')}</p>
-                        )}
                       </div>
                     )
                   })}
                 </div>
-                {issues.length > 0 && (
-                  <div className="px-4 py-2 bg-red-50 border-t border-red-100">
-                    <p className="text-xs text-red-500">{issues.join(' · ')}</p>
+                {/* Issues */}
+                {slot.issues?.length > 0 && (
+                  <div className="px-5 py-2 bg-red-50 border-t border-red-100 flex items-center gap-2">
+                    <span className="text-xs text-red-500">{slot.issues.join(' - ')}</span>
                   </div>
                 )}
               </div>
@@ -592,7 +603,9 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
           })}
         </div>
       ) : (
-        <Button onClick={generateSchedule} loading={generating} className="w-full" size="lg">
+        <button onClick={generateSchedule} disabled={generating}
+          className="w-full py-4 rounded-2xl bg-[#323232] text-white font-semibold text-sm hover:bg-black transition-all disabled:opacity-50">
+          {generating ? 'Generating...' : 'Auto-Generate Schedule from Availability'}
           Auto-Generate Schedule from Availability
           Auto-Generate Schedule from Availability
           Auto-Generate Schedule from Availability
