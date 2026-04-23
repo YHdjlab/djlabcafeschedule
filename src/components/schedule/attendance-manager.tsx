@@ -32,7 +32,7 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
   const hour = beirutTime.getUTCHours()
   const isWeekend = [0, 6].includes(beirutTime.getUTCDay())
   const isRush = isWeekend || (hour >= 15 && hour < 21)
-  const timeStr = ${String(hour).padStart(2,'0')}:
+  const timeStr = String(hour).padStart(2,"0") + ":" + String(beirutTime.getUTCMinutes()).padStart(2,"0")
 
   const checkIn = async () => {
     setLoading(true)
@@ -134,7 +134,7 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
               <div>
                 <p className="text-sm font-medium text-[#323232]">{format(new Date(rec.date + 'T00:00:00'), 'EEE, MMM d')}</p>
                 <p className="text-xs text-gray-500">
-                  {rec.checkin_time} {rec.checkout_time ? –  : ''}
+                  {rec.checkin_time}{rec.checkout_time ? " - " + rec.checkout_time : ""}
                 </p>
               </div>
               <div className="flex gap-2">

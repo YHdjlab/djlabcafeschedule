@@ -19,9 +19,9 @@ interface Props {
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
 
 function generateSlots(weekStart: string, rushConfig: any[]) {
-  const weekday = rushConfig.find(r => r.day_type === 'weekday')
-  const weekend = rushConfig.find(r => r.day_type === 'weekend')
-  const slots = []
+  const weekday = rushConfig.find((r: any) => r.day_type === 'weekday')
+  const weekend = rushConfig.find((r: any) => r.day_type === 'weekend')
+  const slots: any[] = []
   const monday = new Date(weekStart + 'T00:00:00')
 
   DAYS.forEach((day, i) => {
@@ -31,8 +31,8 @@ function generateSlots(weekStart: string, rushConfig: any[]) {
 
     if (isWeekend) {
       slots.push({
-        key: ${day}_full,
-        label: ${day} Full Day,
+        key: day + "_full",
+        label: day + " Full Day",
         date: dateStr,
         day,
         start: '08:00',
@@ -41,9 +41,9 @@ function generateSlots(weekStart: string, rushConfig: any[]) {
       })
     } else {
       slots.push(
-        { key: ${day}_morning, label: ${day} Morning, date: dateStr, day, start: '08:00', end: weekday?.rush_start || '15:00', type: 'off-rush' as const },
-        { key: ${day}_rush, label: ${day} Rush, date: dateStr, day, start: weekday?.rush_start || '15:00', end: weekday?.rush_end || '21:00', type: 'rush' as const },
-        { key: ${day}_evening, label: ${day} Evening, date: dateStr, day, start: weekday?.rush_end || '21:00', end: '00:00', type: 'off-rush' as const },
+        { key: day + "_morning", label: day + " Morning", date: dateStr, day, start: '08:00', end: weekday?.rush_start || '15:00', type: 'off-rush' as const },
+        { key: day + "_rush", label: day + " Rush", date: dateStr, day, start: weekday?.rush_start || '15:00', end: weekday?.rush_end || '21:00', type: 'rush' as const },
+        { key: day + "_evening", label: day + " Evening", date: dateStr, day, start: weekday?.rush_end || '21:00', end: '00:00', type: 'off-rush' as const },
       )
     }
   })
@@ -56,7 +56,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
   const [localAvail, setLocalAvail] = useState<Record<string, boolean>>(() => {
     const map: Record<string, boolean> = {}
     availability.forEach(a => {
-      map[${a.week_starting}_] = a.available
+      map[a.week_starting + "_" + a.slot_key] = a.available
     })
     return map
   })
@@ -66,7 +66,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
   const monday = new Date(weekStart + 'T00:00:00')
 
   const toggleSlot = async (slot: typeof slots[0]) => {
-    const key = ${weekStart}_
+    const key = weekStart + "_" + slot.key
     const current = localAvail[key] ?? false
     const newVal = !current
     setSaving(key)
@@ -87,7 +87,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
   const setAllDay = async (day: string, value: boolean) => {
     const daySlots = slots.filter(s => s.day === day)
     const updates: Record<string, boolean> = {}
-    daySlots.forEach(s => { updates[${weekStart}_] = value })
+    daySlots.forEach(s => { updates[weekStart + "_" + s.key] = value })
     setLocalAvail(prev => ({ ...prev, ...updates }))
 
     await Promise.all(daySlots.map(slot =>
@@ -102,7 +102,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
     ))
   }
 
-  const availableCount = slots.filter(s => localAvail[${weekStart}_]).length
+  const availableCount = slots.filter(s => localAvail[weekStart + "_" + s.key]).length
 
   return (
     <div className="space-y-4">
@@ -117,7 +117,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
           </Button>
           <div className="text-center">
             <p className="font-semibold text-[#323232]">
-              {format(monday, 'MMM d')} – {format(addDays(monday, 6), 'MMM d, yyyy')}
+              {format(monday, 'MMM d')} - {format(addDays(monday, 6), 'MMM d, yyyy')}
             </p>
             <p className="text-xs text-[#FF6357] mt-0.5">{availableCount} slots marked available</p>
           </div>
@@ -134,8 +134,8 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
       <div className="grid grid-cols-1 gap-3">
         {DAYS.map(day => {
           const daySlots = slots.filter(s => s.day === day)
-          const allAvailable = daySlots.every(s => localAvail[${weekStart}_])
-          const someAvailable = daySlots.some(s => localAvail[${weekStart}_])
+          const allAvailable = daySlots.every(s => localAvail[weekStart + "_" + s.key])
+          const someAvailable = daySlots.some(s => localAvail[weekStart + "_" + s.key])
           const isWeekend = day === 'Saturday' || day === 'Sunday'
           const dayDate = daySlots[0]?.date
 
@@ -166,7 +166,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
               </div>
               <div className="p-3 grid grid-cols-1 gap-2">
                 {daySlots.map(slot => {
-                  const key = ${weekStart}_
+                  const key = weekStart + "_" + slot.key
                   const isAvailable = localAvail[key] ?? false
                   const isSaving = saving === key
 
@@ -186,7 +186,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-[#323232]">
-                            {slot.start} – {slot.end === '00:00' ? 'Midnight' : slot.end}
+                            {slot.start} - {slot.end === '00:00' ? 'Midnight' : slot.end}
                           </span>
                           <Badge variant={slot.type === 'rush' ? 'coral' : 'blue'}>
                             {slot.type}

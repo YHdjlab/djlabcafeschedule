@@ -64,7 +64,7 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
       shift_date: form.shiftDate,
       shift_label: form.shiftLabel || 'Shift',
       status: 'pending_staff_b',
-    }).select(*, staff_a:staff_a_id(full_name), staff_b:staff_b_id(full_name)).single()
+    }).select("*, staff_a:staff_a_id(full_name), staff_b:staff_b_id(full_name)").single()
 
     if (err) { setError(err.message); setLoading(false); return }
     setSwaps(prev => [data, ...prev])
@@ -80,7 +80,7 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
       .from('swap_requests')
       .update({ status, resolved_at: ['approved','denied'].includes(status) ? new Date().toISOString() : null })
       .eq('id', id)
-      .select(*, staff_a:staff_a_id(full_name), staff_b:staff_b_id(full_name)).single()
+      .select("*, staff_a:staff_a_id(full_name), staff_b:staff_b_id(full_name)").single()
     if (data) setSwaps(prev => prev.map(s => s.id === id ? data : s))
     setActionLoading(null)
   }
@@ -142,7 +142,7 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">
                       {swap.shift_date && format(new Date(swap.shift_date + 'T00:00:00'), 'EEE MMM d')}
-                      {swap.shift_label &&  · }
+                      {swap.shift_label && " - " + swap.shift_label}
                     </p>
                   </div>
                   <Badge variant={STATUS_COLORS[swap.status]}>

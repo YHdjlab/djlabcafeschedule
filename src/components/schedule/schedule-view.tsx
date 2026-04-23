@@ -73,7 +73,7 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
           </Button>
           <div className="text-center">
             <p className="font-semibold text-[#323232]">
-              Week of {format(currentWeek, 'MMM d')} – {format(addDays(currentWeek, 6), 'MMM d, yyyy')}
+              Week of {format(currentWeek, 'MMM d')} - {format(addDays(currentWeek, 6), 'MMM d, yyyy')}
             </p>
             <p className="text-xs text-gray-400 mt-0.5">{weekSchedules.length} shifts scheduled</p>
           </div>
@@ -139,7 +139,7 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
                                     <span className="text-[9px] font-bold">{s.full_name?.charAt(0)}</span>
                                   </div>
                                   <span>{s.full_name?.split(' ')[0]}</span>
-                                  <span className="opacity-60">· {s.assignedRole}</span>
+                                  <span className="opacity-60">- {s.assignedRole}</span>
                                 </div>
                               ))}
                               {staff.length === 0 && (

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase-server'
+﻿import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { SwapManager } from '@/components/schedule/swap-manager'
 
@@ -8,18 +8,21 @@ export default async function SwapsPage() {
   if (!user) redirect('/login')
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   if (!profile) redirect('/login')
-
   const isAdmin = ['gm','supervisor_floor','supervisor_bar'].includes(profile.role)
-
+  let swapsQuery = supabase
+    .from('swap_requests')
+    .select('*, staff_a:staff_a_id(id,full_name,role), staff_b:staff_b_id(id,full_name,role)')
+    .order('created_at', { ascending: false })
+  if (isAdmin) {
+    swapsQuery = swapsQuery.in('status', ['pending_supervisor','approved','denied'])
+  } else {
+    swapsQuery = swapsQuery.or('staff_a_id.eq.' + user.id + ',staff_b_id.eq.' + user.id)
+  }
   const [{ data: swaps }, { data: staff }, { data: schedules }] = await Promise.all([
-    supabase.from('swap_requests')
-      .select('*, staff_a:staff_a_id(id,full_name,role), staff_b:staff_b_id(id,full_name,role)')
-      .or(isAdmin ? 'status.eq.pending_supervisor,status.eq.approved,status.eq.denied' : staff_a_id.eq.,staff_b_id.eq.)
-      .order('created_at', { ascending: false }),
+    swapsQuery,
     supabase.from('profiles').select('id,full_name,role').eq('active', true).neq('id', user.id),
     supabase.from('schedules').select('id,slot_date,slot_label').eq('status','approved').gte('slot_date', new Date().toISOString().slice(0,10)),
   ])
-
   return (
     <div className="space-y-6">
       <div>

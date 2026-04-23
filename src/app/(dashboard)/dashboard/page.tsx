@@ -121,7 +121,7 @@ export default async function DashboardPage() {
             ].map(action => (
               <Link key={action.href} href={action.href}
                 className="flex flex-col items-center gap-2 p-4 rounded-xl bg-[#F7F0E8] hover:bg-black/5 transition-all text-center group">
-                <div className={p-2.5 rounded-xl }>{action.icon}</div>
+                <div className={"p-2.5 rounded-xl " + action.color}>{action.icon}</div>
                 <span className="text-xs font-medium text-[#323232]">{action.label}</span>
               </Link>
             ))}
@@ -139,7 +139,7 @@ export default async function DashboardPage() {
                 <div key={swap.id} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8]">
                   <div>
                     <p className="text-sm font-medium text-[#323232]">Swap Request</p>
-                    <p className="text-xs text-gray-500">{swap.shift_date} · {swap.shift_label}</p>
+                    <p className="text-xs text-gray-500">{swap.shift_date} - {swap.shift_label}</p>
                   </div>
                   <Badge variant="yellow">Pending</Badge>
                 </div>

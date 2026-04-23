@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from 'clsx'
+﻿import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
@@ -42,12 +42,14 @@ export function isSupervisor(role: string) {
 export function formatTime(time: string) {
   const [h, m] = time.split(':')
   const hour = parseInt(h)
-  return \:\\
+  const period = hour >= 12 ? 'PM' : 'AM'
+  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
+  return displayHour + ':' + m + period
 }
 
 export function getWeekDates(weekStarting: string) {
   const dates = []
-  const start = new Date(weekStarting)
+  const start = new Date(weekStarting + 'T00:00:00')
   for (let i = 0; i < 7; i++) {
     const d = new Date(start)
     d.setDate(start.getDate() + i)

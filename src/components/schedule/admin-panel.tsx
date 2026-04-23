@@ -52,12 +52,12 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
   const supabase = createClient()
 
   const totalApprovals = pendingDaysOff.length + pendingSwaps.length + pendingAttendance.length
-  const activeStaff = staff.filter(s => s.active)
+  const activeStaff = staff.filter((s: any) => s.active)
 
   return (
     <div className="space-y-4">
       <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {TABS.map(t => (
+        {TABS.map((t: any) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
@@ -99,7 +99,7 @@ function OverviewTab({ staff, pendingDaysOff, pendingSwaps, pendingAttendance, s
           { label: 'Approved Shifts', value: approvedSchedules.length, icon: <Calendar size={18}/>, color: 'bg-green-50 text-green-500' },
           { label: 'Pending Approvals', value: pendingDaysOff.length + pendingSwaps.length + pendingAttendance.length, icon: <CheckSquare size={18}/>, color: 'bg-orange-50 text-[#FF6357]' },
           { label: 'Availability Set', value: staffWithAvail + '/' + activeStaff.length, icon: <Clock size={18}/>, color: 'bg-purple-50 text-purple-500' },
-        ].map(stat => (
+        ].map((stat: any) => (
           <Card key={stat.label} padding="md">
             <div className="flex items-start justify-between">
               <div>
@@ -166,12 +166,12 @@ function StaffTab({ staff, setStaff, profile, supabase }: any) {
       active: !current,
       terminated_at: !current ? null : new Date().toISOString()
     }).eq('id', id).select().single()
-    if (data) setStaff((prev: any[]) => prev.map(s => s.id === id ? data : s))
+    if (data) setStaff((prev: any[]) => prev.map((s: any) => s.id === id ? data : s))
   }
 
   const updateRole = async (id: string, role: string) => {
     const { data } = await supabase.from('profiles').update({ role }).eq('id', id).select().single()
-    if (data) setStaff((prev: any[]) => prev.map(s => s.id === id ? data : s))
+    if (data) setStaff((prev: any[]) => prev.map((s: any) => s.id === id ? data : s))
   }
 
   return (
@@ -277,9 +277,9 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     const floorRoles = ['floor','supervisor_floor']
     const barRoles = ['bar','supervisor_bar']
 
-    const byLeast = (ids: string[]) => [...ids].sort((a,b) => (assignCount[a]||0) - (assignCount[b]||0))
+    const byLeast = (ids: string[]) => [...ids].sort((a: any, b: any) => (assignCount[a]||0) - (assignCount[b]||0))
 
-    const built = slots.map(slot => {
+    const built = slots.map((slot: any) => {
       const avail = getAvail(slot.key)
       const sups = byLeast(avail.filter((id: string) => supRoles.includes(STAFF_MAP[id]?.role)))
       const bars = byLeast(avail.filter((id: string) => barRoles.includes(STAFF_MAP[id]?.role)))
@@ -317,7 +317,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
   const saveSchedule = async () => {
     setSaving(true)
     const schedId = 'SCH-' + Date.now()
-    const rows = generatedSlots.map(slot => ({
+    const rows = generatedSlots.map((slot: any) => ({
       schedule_id: schedId,
       week_starting: weekStart,
       slot_id: slot.key,
@@ -344,12 +344,12 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
   const approveSchedule = async (weekStarting: string) => {
     await supabase.from('schedules').update({ status: 'approved', approved_at: new Date().toISOString(), approved_by: profile.id }).eq('week_starting', weekStarting).eq('status', 'pending_approval')
-    setSchedules((prev: any[]) => prev.map(s => s.week_starting === weekStarting && s.status === 'pending_approval' ? { ...s, status: 'approved' } : s))
+    setSchedules((prev: any[]) => prev.map((s: any) => s.week_starting === weekStarting && s.status === 'pending_approval' ? { ...s, status: 'approved' } : s))
   }
 
-  const weekSchedules = schedules.filter(s => s.week_starting === weekStart)
-  const pendingWeek = weekSchedules.filter(s => s.status === 'pending_approval')
-  const approvedWeek = weekSchedules.filter(s => s.status === 'approved')
+  const weekSchedules = schedules.filter((s: any) => s.week_starting === weekStart)
+  const pendingWeek = weekSchedules.filter((s: any) => s.status === 'pending_approval')
+  const approvedWeek = weekSchedules.filter((s: any) => s.status === 'approved')
 
   return (
     <div className="space-y-4">
@@ -357,8 +357,8 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
         <div className="flex items-center justify-between p-2">
           <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()-7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }} className="p-2 rounded-lg hover:bg-black/5">?</button>
           <div className="text-center">
-            <p className="font-semibold text-sm text-[#323232]">Week of {format(new Date(weekStart+'T00:00:00'), 'MMM d')} – {format(addDays(new Date(weekStart+'T00:00:00'),6), 'MMM d, yyyy')}</p>
-            <p className="text-xs text-gray-400">{weekSchedules.length} slots · {weekAvailability.length} availability entries</p>
+            <p className="font-semibold text-sm text-[#323232]">Week of {format(new Date(weekStart+'T00:00:00'), 'MMM d')} - {format(addDays(new Date(weekStart+'T00:00:00'),6), 'MMM d, yyyy')}</p>
+            <p className="text-xs text-gray-400">{weekSchedules.length} slots - {weekAvailability.length} availability entries</p>
           </div>
           <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()+7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }} className="p-2 rounded-lg hover:bg-black/5">?</button>
         </div>
@@ -371,7 +371,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
             <Badge variant="yellow">{pendingWeek.length} slots</Badge>
           </CardHeader>
           <div className="space-y-2 mb-4">
-            {pendingWeek.slice(0,5).map(slot => (
+            {pendingWeek.slice(0,5).map((slot: any) => (
               <div key={slot.id} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8] text-sm">
                 <span className="font-medium text-[#323232]">{slot.slot_label}</span>
                 <div className="flex gap-1 text-xs text-gray-500">
@@ -393,11 +393,11 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
             <Badge variant="green">{approvedWeek.length} slots</Badge>
           </CardHeader>
           <div className="space-y-1">
-            {approvedWeek.map(slot => (
+            {approvedWeek.map((slot: any) => (
               <div key={slot.id} className="flex items-center justify-between p-3 rounded-xl bg-green-50 text-sm">
                 <span className="font-medium text-[#323232]">{slot.slot_label}</span>
                 <span className="text-xs text-gray-500">
-                  {[slot.supervisor, slot.bar_staff, slot.floor_staff1, slot.floor_staff2].filter(Boolean).map((s: any) => s.full_name?.split(' ')[0]).join(' · ')}
+                  {[slot.supervisor, slot.bar_staff, slot.floor_staff1, slot.floor_staff2].filter(Boolean).map((s: any) => s.full_name?.split(' ')[0]).join(' - ')}
                 </span>
               </div>
             ))}
@@ -412,7 +412,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
             <Button size="sm" onClick={saveSchedule} loading={saving}>Save & Submit</Button>
           </CardHeader>
           <div className="space-y-2">
-            {generatedSlots.map(slot => (
+            {generatedSlots.map((slot: any) => (
               <div key={slot.key} className={cn('p-3 rounded-xl border text-sm', slot.issues?.length ? 'bg-red-50 border-red-200' : 'bg-green-50 border-green-200')}>
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-[#323232]">{slot.label}</span>
@@ -426,7 +426,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                     slot.floor_staff2_id && { id: slot.floor_staff2_id, role: 'Floor' },
                   ].filter(Boolean).map((a: any, i) => (
                     <span key={i} className="text-xs bg-white px-2 py-0.5 rounded-lg border">
-                      {STAFF_MAP[a.id]?.full_name?.split(' ')[0]} · {a.role}
+                      {STAFF_MAP[a.id]?.full_name?.split(' ')[0]} - {a.role}
                     </span>
                   ))}
                 </div>
@@ -461,21 +461,21 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
       else update.gm_approved_at = new Date().toISOString()
     }
     await supabase.from('day_off_requests').update(update).eq('id', id)
-    setPendingDaysOff((prev: any[]) => prev.filter(r => r.id !== id))
+    setPendingDaysOff((prev: any[]) => prev.filter((r: any) => r.id !== id))
     setLoading(null)
   }
 
   const approveSwap = async (id: string, action: 'approve'|'deny') => {
     setLoading(id+action)
     await supabase.from('swap_requests').update({ status: action === 'approve' ? 'approved' : 'denied', resolved_at: new Date().toISOString() }).eq('id', id)
-    setPendingSwaps((prev: any[]) => prev.filter(r => r.id !== id))
+    setPendingSwaps((prev: any[]) => prev.filter((r: any) => r.id !== id))
     setLoading(null)
   }
 
   const approveAttendance = async (id: string, action: 'approve'|'reject') => {
     setLoading(id+action)
     await supabase.from('attendance').update({ status: action === 'approve' ? 'checked_in' : 'rejected' }).eq('id', id)
-    setPendingAttendance((prev: any[]) => prev.filter(r => r.id !== id))
+    setPendingAttendance((prev: any[]) => prev.filter((r: any) => r.id !== id))
     setLoading(null)
   }
 
@@ -495,7 +495,7 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
               <div key={rec.id} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8]">
                 <div>
                   <p className="text-sm font-medium text-[#323232]">{rec.staff?.full_name}</p>
-                  <p className="text-xs text-gray-500">{rec.checkin_time} · {rec.shift_type}</p>
+                  <p className="text-xs text-gray-500">{rec.checkin_time} - {rec.shift_type}</p>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" loading={loading===rec.id+'approve'} onClick={() => approveAttendance(rec.id,'approve')}><Check size={14}/></Button>
@@ -515,7 +515,7 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
               <div key={swap.id} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8]">
                 <div>
                   <p className="text-sm font-medium text-[#323232]">{swap.staff_a?.full_name} ? {swap.staff_b?.full_name}</p>
-                  <p className="text-xs text-gray-500">{swap.shift_date} · {swap.shift_label}</p>
+                  <p className="text-xs text-gray-500">{swap.shift_date} - {swap.shift_label}</p>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" loading={loading===swap.id+'approve'} onClick={() => approveSwap(swap.id,'approve')}><Check size={14}/></Button>
@@ -535,7 +535,7 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
               <div key={req.id} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8]">
                 <div>
                   <p className="text-sm font-medium text-[#323232]">{req.staff?.full_name}</p>
-                  <p className="text-xs text-gray-500">{format(new Date(req.date_off+'T00:00:00'), 'EEE MMM d')} {req.reason ? '· '+req.reason : ''}</p>
+                  <p className="text-xs text-gray-500">{format(new Date(req.date_off+'T00:00:00'), 'EEE MMM d')} {req.reason ? '- '+req.reason : ''}</p>
                   {req.status === 'pending_gm' && <Badge variant="yellow">Awaiting GM</Badge>}
                 </div>
                 <div className="flex gap-2">
@@ -580,14 +580,14 @@ function SettingsTab({ rushConfig, setRushConfig, profile, supabase }: any) {
         <CardHeader><CardTitle>Rush Hour Configuration</CardTitle></CardHeader>
         <div className="space-y-6">
           <div>
-            <p className="text-sm font-semibold text-[#323232] mb-3">Weekdays (Mon–Fri)</p>
+            <p className="text-sm font-semibold text-[#323232] mb-3">Weekdays (Mon-Fri)</p>
             <div className="grid grid-cols-2 gap-3">
               <Input label="Rush starts" type="time" value={wdStart} onChange={e => setWdStart(e.target.value)} disabled={!isGM}/>
               <Input label="Rush ends" type="time" value={wdEnd} onChange={e => setWdEnd(e.target.value)} disabled={!isGM}/>
             </div>
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#323232] mb-3">Weekends (Sat–Sun)</p>
+            <p className="text-sm font-semibold text-[#323232] mb-3">Weekends (Sat-Sun)</p>
             <div className="grid grid-cols-2 gap-3">
               <Input label="Rush starts" type="time" value={weStart} onChange={e => setWeStart(e.target.value)} disabled={!isGM}/>
               <Input label="Rush ends" type="time" value={weEnd} onChange={e => setWeEnd(e.target.value)} disabled={!isGM}/>
@@ -612,7 +612,7 @@ function SettingsTab({ rushConfig, setRushConfig, profile, supabase }: any) {
             { label: 'Swap cutoff', value: '2 hours before shift' },
             { label: 'Schedule approval', value: 'GM required' },
             { label: 'Punch-in approval', value: 'JP + Miled + Garo' },
-          ].map(item => (
+          ].map((item: any) => (
             <div key={item.label} className="flex justify-between p-3 rounded-xl bg-[#F7F0E8]">
               <span className="text-gray-500">{item.label}</span>
               <span className="font-medium text-[#323232]">{item.value}</span>
