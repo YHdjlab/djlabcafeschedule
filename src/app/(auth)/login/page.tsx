@@ -1,11 +1,8 @@
-﻿'use client'
+'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,19 +23,32 @@ export default function LoginPage() {
   }
 
   return (
-    <Card className="shadow-xl border-0">
-      <h2 className="text-xl font-bold text-[#323232] mb-1">Welcome back</h2>
-      <p className="text-sm text-gray-500 mb-6">Sign in to your account</p>
-      <form onSubmit={handleLogin} className="space-y-4">
-        <Input label="Email address" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@djlab.com" required autoComplete="email"/>
-        <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required autoComplete="current-password"/>
-        {error && <div className="p-3 rounded-xl bg-red-50 border border-red-100 text-sm text-red-600">{error}</div>}
-        <Button type="submit" loading={loading} className="w-full" size="lg">Sign In</Button>
+    <div style={{backgroundColor:'#2a2a2a', borderRadius:'24px', padding:'32px', border:'1px solid rgba(255,255,255,0.08)', boxShadow:'0 25px 50px rgba(0,0,0,0.5)'}}>
+      <h2 style={{color:'white', fontSize:'22px', fontWeight:'700', marginBottom:'4px'}}>Welcome back</h2>
+      <p style={{color:'rgba(255,255,255,0.4)', fontSize:'14px', marginBottom:'28px'}}>Sign in to your account</p>
+      <form onSubmit={handleLogin} style={{display:'flex', flexDirection:'column', gap:'16px'}}>
+        <div>
+          <label style={{color:'rgba(255,255,255,0.6)', fontSize:'13px', fontWeight:'500', display:'block', marginBottom:'6px'}}>Email address</label>
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@djlab.com" required autoComplete="email"
+            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'1px solid rgba(255,255,255,0.1)', backgroundColor:'rgba(255,255,255,0.06)', color:'white', fontSize:'14px', outline:'none', boxSizing:'border-box'}}
+            onFocus={e => e.target.style.borderColor='#FF6357'} onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.1)'}/>
+        </div>
+        <div>
+          <label style={{color:'rgba(255,255,255,0.6)', fontSize:'13px', fontWeight:'500', display:'block', marginBottom:'6px'}}>Password</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required autoComplete="current-password"
+            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'1px solid rgba(255,255,255,0.1)', backgroundColor:'rgba(255,255,255,0.06)', color:'white', fontSize:'14px', outline:'none', boxSizing:'border-box'}}
+            onFocus={e => e.target.style.borderColor='#FF6357'} onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.1)'}/>
+        </div>
+        {error && <div style={{padding:'12px 16px', borderRadius:'12px', backgroundColor:'rgba(255,99,87,0.15)', border:'1px solid rgba(255,99,87,0.3)', color:'#FF6357', fontSize:'13px'}}>{error}</div>}
+        <button type="submit" disabled={loading}
+          style={{width:'100%', padding:'14px', borderRadius:'12px', backgroundColor:'#FF6357', color:'white', fontWeight:'700', fontSize:'15px', border:'none', cursor:loading?'not-allowed':'pointer', opacity:loading?0.7:1, transition:'all 0.2s', marginTop:'4px'}}>
+          {loading ? 'Signing in...' : 'Sign In'}
+        </button>
       </form>
-      <p className="text-center text-sm text-gray-500 mt-6">
+      <p style={{textAlign:'center', color:'rgba(255,255,255,0.35)', fontSize:'13px', marginTop:'24px'}}>
         {"Don't have an account? "}
-        <Link href="/register" className="text-[#FF6357] font-medium hover:underline">Register</Link>
+        <a href="/register" style={{color:'#FF6357', fontWeight:'600', textDecoration:'none'}}>Register</a>
       </p>
-    </Card>
+    </div>
   )
 }
