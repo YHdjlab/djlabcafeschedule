@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
 interface Props {
   profile: any
   availability: any[]
+  schedules: any[]
   nextMonday: string
   currentMonday: string
   rushConfig: any[]
