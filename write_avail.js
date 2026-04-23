@@ -1,4 +1,6 @@
-'use client'
+﻿const fs = require("fs");
+
+const grid = `'use client'
 import { useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { cn } from '@/lib/utils'
@@ -203,4 +205,7 @@ export function AvailabilityGrid({ profile, availability, nextMonday, currentMon
       </div>
     </div>
   )
-}
+}`;
+
+fs.writeFileSync("src/components/schedule/availability-grid.tsx", grid, "utf8");
+console.log("availability-grid written");
