@@ -11,7 +11,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen bg-[#F7F0E8]">
       <Sidebar profile={profile}/>
-      <main className="lg:ml-60 min-h-screen">
+      <main className="sidebar-offset min-h-screen">
         <div className="px-4 pt-16 pb-8 lg:pt-8 lg:px-8">
           {children}
         </div>
