@@ -1,0 +1,29 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-dark: #323232;
+  --color-brand-cream: #F7F0E8;
+  --color-brand-coral: #FF6357;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: #F7F0E8;
+  color: #323232;
+}
+
+:root {
+  --brand-dark: #323232;
+  --brand-cream: #F7F0E8;
+  --brand-coral: #FF6357;
+}
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
