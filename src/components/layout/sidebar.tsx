@@ -32,8 +32,8 @@ export function Sidebar({ profile }: { profile: Profile }) {
 
   const Inner = () => (
     <div className="flex flex-col h-full bg-white border-r border-black/5">
-      <div className="p-5 border-b border-black/5" style={{backgroundColor: '#323232'}}>
-        <img src="/images/logo.png" alt="DjLab Cafe" style={{height: '40px', width: 'auto'}}/>
+      <div style={{backgroundColor: '#323232', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
+        <img src="/images/logo.png" alt="DjLab Cafe" style={{height: '44px', width: 'auto', objectFit: 'contain'}}/>
       </div>
       <div className="p-3 border-b border-black/5">
         <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F7F0E8]">
