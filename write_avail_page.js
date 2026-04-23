@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase-server'
+﻿const fs = require("fs");
+const page = `import { createClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { AvailabilityGrid } from '@/components/schedule/availability-grid'
 import { getNextMonday, getCurrentWeekMonday } from '@/lib/utils'
@@ -32,4 +33,6 @@ export default async function AvailabilityPage() {
       />
     </div>
   )
-}
+}`;
+fs.writeFileSync("src/app/(dashboard)/availability/page.tsx", page, "utf8");
+console.log("page written");
