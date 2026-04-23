@@ -33,3 +33,7 @@ html, body {
     margin-left: 240px;
   }
 }
+
+@media (min-width: 1024px) {
+  #main-content { margin-left: 240px !important; }
+}
