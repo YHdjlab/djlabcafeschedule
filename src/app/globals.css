@@ -28,6 +28,4 @@ html, body {
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
-@media (min-width: 1024px) {
-  .sidebar-offset { margin-left: 240px; }
-}
+@media (min-width: 1024px) { .sidebar-offset { margin-left: 240px; } }
