@@ -423,24 +423,15 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       {generatedSlots.length > 0 ? (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-[#323232]">Generated Schedule Preview</h3>
+            <div>
+              <h3 className="font-semibold text-[#323232]">Generated Schedule Preview</h3>
+              <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use dropdowns to swap staff.</p>
+            </div>
             <Button size="sm" onClick={saveSchedule} loading={saving}>Save and Submit</Button>
           </div>
           {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(day => {
             const daySlots = generatedSlots.filter((s: any) => s.day === day)
             if (!daySlots.length) return null
-            const staffMap: Record<string, {role: string, slots: any[]}> = {}
-            daySlots.forEach((slot: any) => {
-              const add = (id: string, role: string) => {
-                if (!id) return
-                if (!staffMap[id]) staffMap[id] = { role, slots: [] }
-                staffMap[id].slots.push(slot)
-              }
-              add(slot.supervisor_id, 'Supervisor')
-              add(slot.bar_staff_id, 'Bar')
-              add(slot.floor_staff1_id, 'Floor')
-              add(slot.floor_staff2_id, 'Floor')
-            })
             const issues = [...new Set(daySlots.flatMap((s: any) => s.issues || []))]
             const isWeekend = day === 'Saturday' || day === 'Sunday'
             const ft = (t: string) => { if (t === '00:00') return '12am'; const h = parseInt(t.split(':')[0]); if (h < 12) return h + 'am'; if (h === 12) return '12pm'; return (h-12) + 'pm' }
@@ -451,32 +442,68 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                     <span className="font-bold text-sm text-[#323232]">{day}</span>
                     <span className="text-xs text-gray-400">{daySlots[0]?.date}</span>
                   </div>
-                  <span className="text-xs text-gray-500">{Object.keys(staffMap).length} staff assigned</span>
+                  <span className="text-xs text-gray-500">{daySlots.length} shift{daySlots.length > 1 ? 's' : ''}</span>
                 </div>
                 <div className="divide-y divide-black/5">
-                  {Object.entries(staffMap).map(([id, data]: [string, any]) => {
-                    const s = STAFF_MAP[id]
-                    if (!s) return null
-                    const start = data.slots[0]?.start || '08:00'
-                    const end = data.slots[data.slots.length-1]?.end || '00:00'
-                    const startH = parseInt(start.split(':')[0])
-                    const endH = end === '00:00' ? 24 : parseInt(end.split(':')[0])
-                    const hours = endH - startH
+                  {daySlots.map((slot: any) => {
+                    const assigned = [
+                      slot.supervisor_id && { id: slot.supervisor_id, role: 'Supervisor', field: 'supervisor_id', eligibleRoles: ['supervisor_floor','supervisor_bar'] },
+                      slot.bar_staff_id && { id: slot.bar_staff_id, role: 'Bar', field: 'bar_staff_id', eligibleRoles: ['bar','supervisor_bar'] },
+                      slot.floor_staff1_id && { id: slot.floor_staff1_id, role: 'Floor', field: 'floor_staff1_id', eligibleRoles: ['floor','supervisor_floor'] },
+                      slot.floor_staff2_id && { id: slot.floor_staff2_id, role: 'Floor 2', field: 'floor_staff2_id', eligibleRoles: ['floor','supervisor_floor'] },
+                    ].filter(Boolean)
+                    const slotAvail = getAvail(slot)
                     return (
-                      <div key={id} className="px-4 py-3 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-[#323232] flex items-center justify-center flex-shrink-0">
-                            <span className="text-white text-xs font-bold">{s.full_name?.charAt(0)}</span>
+                      <div key={slot.key} className="px-4 py-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-[#323232]">{slot.label}</span>
+                            <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', slot.type === 'rush' ? 'bg-orange-100 text-orange-600' : 'bg-blue-100 text-blue-600')}>{slot.type}</span>
                           </div>
-                          <div>
-                            <p className="text-sm font-semibold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
-                            <p className="text-xs text-gray-400">{data.role}</p>
-                          </div>
+                          <span className="text-xs text-gray-400">{ft(slot.start)} - {ft(slot.end === '00:00' ? '00:00' : slot.end)}</span>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-semibold text-[#323232]">{ft(start)} - {ft(end)}</p>
-                          <p className="text-xs text-[#FF6357] font-medium">{hours}h total</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {assigned.map((a: any) => {
+                            const current = STAFF_MAP[a.id]
+                            const alternatives = slotAvail.filter((sid: string) =>
+                              sid !== a.id && a.eligibleRoles.includes(STAFF_MAP[sid]?.role) &&
+                              sid !== slot.supervisor_id && sid !== slot.bar_staff_id &&
+                              (a.field === 'floor_staff1_id' || sid !== slot.floor_staff1_id) &&
+                              (a.field === 'floor_staff2_id' || sid !== slot.floor_staff2_id)
+                            )
+                            return (
+                              <div key={a.field} className="flex items-center gap-2 p-2 rounded-xl bg-[#F7F0E8]">
+                                <div className="w-6 h-6 rounded-full bg-[#323232] flex items-center justify-center flex-shrink-0">
+                                  <span className="text-white text-xs font-bold">{current?.full_name?.charAt(0)}</span>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-semibold text-[#323232] truncate">{current?.full_name?.split(' ')[0] || 'Unassigned'}</p>
+                                  <p className="text-xs text-gray-400">{a.role}</p>
+                                </div>
+                                {alternatives.length > 0 && (
+                                  <select
+                                    value=""
+                                    onChange={e => {
+                                      if (!e.target.value) return
+                                      setGeneratedSlots(prev => prev.map((gs: any) =>
+                                        gs.key === slot.key ? { ...gs, [a.field]: e.target.value } : gs
+                                      ))
+                                    }}
+                                    className="text-xs border border-black/10 rounded-lg px-1 py-0.5 bg-white text-[#323232] cursor-pointer"
+                                  >
+                                    <option value="">Swap</option>
+                                    {alternatives.map((sid: string) => (
+                                      <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>
+                                    ))}
+                                  </select>
+                                )}
+                              </div>
+                            )
+                          })}
                         </div>
+                        {slot.issues?.length > 0 && (
+                          <p className="text-xs text-red-500 mt-2">{slot.issues.join(' · ')}</p>
+                        )}
                       </div>
                     )
                   })}
@@ -492,6 +519,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
         </div>
       ) : (
         <Button onClick={generateSchedule} loading={generating} className="w-full" size="lg">
+          Auto-Generate Schedule from Availability
           Auto-Generate Schedule from Availability
           Auto-Generate Schedule from Availability
         </Button>
