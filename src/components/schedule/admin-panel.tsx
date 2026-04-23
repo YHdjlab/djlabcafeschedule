@@ -77,7 +77,7 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
 
       {tab === 'overview' && <OverviewTab staff={staff} pendingDaysOff={pendingDaysOff} pendingSwaps={pendingSwaps} pendingAttendance={pendingAttendance} schedules={schedules} availability={availability}/>}
       {tab === 'staff' && <StaffTab staff={staff} setStaff={setStaff} profile={profile} supabase={supabase}/>}
-      {tab === 'schedule' && <ScheduleBuilderTab staff={staff} schedules={schedules} setSchedules={setSchedules} profile={profile} supabase={supabase} availability={availability}/>}
+      {tab === 'schedule' && <ScheduleBuilderTab staff={staff} schedules={schedules} setSchedules={setSchedules} profile={profile} supabase={supabase} availability={availability} rushConfig={rushConfig}/>}
       {tab === 'approvals' && <ApprovalsTab pendingDaysOff={pendingDaysOff} setPendingDaysOff={setPendingDaysOff} pendingSwaps={pendingSwaps} setPendingSwaps={setPendingSwaps} pendingAttendance={pendingAttendance} setPendingAttendance={setPendingAttendance} profile={profile} supabase={supabase}/>}
       {tab === 'settings' && <SettingsTab rushConfig={rushConfig} setRushConfig={setRushConfig} profile={profile} supabase={supabase}/>}
     </div>
@@ -227,7 +227,7 @@ function StaffTab({ staff, setStaff, profile, supabase }: any) {
   )
 }
 
-function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase, availability }: any) {
+function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase, availability, rushConfig }: any) {
   const [weekStart, setWeekStart] = useState(() => {
     const today = new Date()
     const day = today.getDay()
@@ -268,36 +268,88 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     setGenerating(true)
     const monday = new Date(weekStart + 'T00:00:00')
     const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-    const slots: any[] = []
+    const weekdayConfig = rushConfig?.find((r: any) => r.day_type === 'weekday')
+    const rushStartH = parseInt((weekdayConfig?.rush_start || '15:00').split(':')[0])
+    const rushEndH = parseInt((weekdayConfig?.rush_end || '21:00').split(':')[0])
 
+    const supRoles = ['supervisor_floor','supervisor_bar']
+    const floorRoles = ['floor','supervisor_floor']
+    const barRoles = ['bar','supervisor_bar']
+    const assignCount: Record<string,number> = {}
+    activeStaff.forEach((s: any) => { assignCount[s.id] = 0 })
+    const byLeast = (ids: string[]) => [...ids].sort((a: any, b: any) => (assignCount[a]||0) - (assignCount[b]||0))
+
+    // For each staff member, find their available hours per day
+    const getStaffHoursForDay = (staffId: string, dateStr: string) => {
+      const hours = weekAvailability
+        .filter((a: any) => a.staff_id === staffId && a.slot_date === dateStr)
+        .map((a: any) => { const m = a.slot_key.match(/_h(\d+)$/); return m ? parseInt(m[1]) : -1 })
+        .filter((h: number) => h >= 0)
+        .sort((a: number, b: number) => a - b)
+      return hours
+    }
+
+    const getStaffRange = (staffId: string, dateStr: string) => {
+      const hours = getStaffHoursForDay(staffId, dateStr)
+      if (!hours.length) return null
+      return { start: hours[0], end: hours[hours.length - 1] + 1, hours }
+    }
+
+    // For a slot time range, get staff available for ALL hours in that range
+    const getAvailForRange = (dateStr: string, startH: number, endH: number) => {
+      const staffWithAvail = new Set<string>()
+      weekAvailability.forEach((a: any) => {
+        if (a.slot_date === dateStr) {
+          const match = a.slot_key.match(/_h(\d+)$/)
+          if (match) {
+            const hour = parseInt(match[1])
+            if (hour >= startH && hour < endH) staffWithAvail.add(a.staff_id)
+          }
+        }
+      })
+      // Only include staff available for majority of hours (at least half)
+      const rangeHours = endH - startH
+      return Array.from(staffWithAvail).filter(sid => {
+        const staffHours = getStaffHoursForDay(sid, dateStr).filter((h: number) => h >= startH && h < endH)
+        return staffHours.length >= Math.ceil(rangeHours * 0.5)
+      })
+    }
+
+    const slots: any[] = []
     DAYS.forEach((day, i) => {
       const date = addDays(monday, i)
       const dateStr = format(date, 'yyyy-MM-dd')
       const isWeekend = i >= 5
 
       if (isWeekend) {
-        slots.push({ key: day+'_full', date: dateStr, day, label: day+' Full Day 8am-12am', type: 'rush', start: '08:00', end: '00:00' })
+        // Weekend: one full rush day
+        slots.push({
+          key: day + '_full', date: dateStr, day, type: 'rush',
+          start: '08:00', end: '00:00',
+          startH: 8, endH: 24,
+          label: day + ' Full Day'
+        })
       } else {
-        slots.push(
-          { key: day+'_morning', date: dateStr, day, label: day+' Morning 8am-3pm', type: 'off-rush', start: '08:00', end: '15:00' },
-          { key: day+'_rush', date: dateStr, day, label: day+' Rush 3pm-9pm', type: 'rush', start: '15:00', end: '21:00' },
-          { key: day+'_evening', date: dateStr, day, label: day+' Evening 9pm-12am', type: 'off-rush', start: '21:00', end: '00:00' },
-        )
+        // Weekday: off-rush morning, rush, off-rush evening
+        // Only create a slot if there's availability in that window
+        const morningAvail = getAvailForRange(dateStr, 8, rushStartH)
+        const rushAvail = getAvailForRange(dateStr, rushStartH, rushEndH)
+        const eveningAvail = getAvailForRange(dateStr, rushEndH, 24)
+
+        if (morningAvail.length > 0) {
+          slots.push({ key: day + '_morning', date: dateStr, day, type: 'off-rush', start: '08:00', end: rushStartH + ':00', startH: 8, endH: rushStartH, label: day + ' Morning' })
+        }
+        if (rushAvail.length > 0) {
+          slots.push({ key: day + '_rush', date: dateStr, day, type: 'rush', start: rushStartH + ':00', end: rushEndH + ':00', startH: rushStartH, endH: rushEndH, label: day + ' Rush' })
+        }
+        if (eveningAvail.length > 0) {
+          slots.push({ key: day + '_evening', date: dateStr, day, type: 'off-rush', start: rushEndH + ':00', end: '00:00', startH: rushEndH, endH: 24, label: day + ' Evening' })
+        }
       }
     })
 
-    const assignCount: Record<string,number> = {}
-    activeStaff.forEach((s: any) => { assignCount[s.id] = 0 })
-
-    // getAvail defined at component level
-    const supRoles = ['supervisor_floor','supervisor_bar']
-    const floorRoles = ['floor','supervisor_floor']
-    const barRoles = ['bar','supervisor_bar']
-
-    const byLeast = (ids: string[]) => [...ids].sort((a: any, b: any) => (assignCount[a]||0) - (assignCount[b]||0))
-
     const built = slots.map((slot: any) => {
-      const avail = getAvail(slot)
+      const avail = getAvailForRange(slot.date, slot.startH, slot.endH)
       const sups = byLeast(avail.filter((id: string) => supRoles.includes(STAFF_MAP[id]?.role)))
       const bars = byLeast(avail.filter((id: string) => barRoles.includes(STAFF_MAP[id]?.role)))
       const floors = byLeast(avail.filter((id: string) => floorRoles.includes(STAFF_MAP[id]?.role)))
@@ -320,11 +372,31 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       let floor_staff2_id = null
       if (slot.type === 'rush') {
         const f2 = floorCandidates.filter((id: string) => id !== floor_staff1_id)[0] || null
-        if (!f2) issues.push('Need 2nd floor staff for rush')
+        if (!f2) issues.push('Need 2nd floor for rush')
         else { floor_staff2_id = f2; assignCount[f2] = (assignCount[f2]||0) + 1 }
       }
 
-      return { ...slot, supervisor_id, bar_staff_id, floor_staff1_id, floor_staff2_id, issues, status: issues.length ? 'flagged' : 'draft' }
+      // Calculate actual hours per assigned staff
+      const getActualHours = (staffId: string | null) => {
+        if (!staffId) return null
+        const range = getStaffRange(staffId, slot.date)
+        if (!range) return null
+        const actualStart = Math.max(range.start, slot.startH)
+        const actualEnd = Math.min(range.end, slot.endH)
+        return { start: actualStart, end: actualEnd, hours: actualEnd - actualStart }
+      }
+
+      return {
+        ...slot,
+        supervisor_id, bar_staff_id, floor_staff1_id, floor_staff2_id, issues,
+        status: issues.length ? 'flagged' : 'draft',
+        actualHours: {
+          supervisor: getActualHours(supervisor_id),
+          bar: getActualHours(bar_staff_id),
+          floor1: getActualHours(floor_staff1_id),
+          floor2: getActualHours(floor_staff2_id),
+        }
+      }
     })
 
     setGeneratedSlots(built)
