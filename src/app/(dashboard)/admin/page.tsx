@@ -10,7 +10,7 @@ export default async function AdminPage() {
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   if (!profile) redirect('/login')
 
-  const isAdmin = ['gm', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
+  const isAdmin = ['gm', 'admin', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
   if (!isAdmin) redirect('/dashboard')
 
   const [

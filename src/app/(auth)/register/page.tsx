@@ -8,6 +8,7 @@ const ROLE_OPTIONS = [
   { value: 'bar', label: 'Bar Staff' },
   { value: 'supervisor_floor', label: 'Supervisor (Floor)' },
   { value: 'supervisor_bar', label: 'Supervisor (Bar)' },
+  { value: 'admin', label: 'Admin' },
   { value: 'gm', label: 'General Manager' },
 ]
 

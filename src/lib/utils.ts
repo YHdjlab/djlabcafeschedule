@@ -13,6 +13,7 @@ export const BRAND = {
 
 export const ROLE_LABELS: Record<string, string> = {
   gm: 'General Manager',
+  admin: 'Admin',
   supervisor_floor: 'Supervisor (Floor)',
   supervisor_bar: 'Supervisor (Bar)',
   floor: 'Floor Staff',
@@ -21,6 +22,7 @@ export const ROLE_LABELS: Record<string, string> = {
 
 export const ROLE_COLORS: Record<string, string> = {
   gm: 'bg-purple-100 text-purple-800',
+  admin: 'bg-purple-100 text-purple-800',
   supervisor_floor: 'bg-blue-100 text-blue-800',
   supervisor_bar: 'bg-indigo-100 text-indigo-800',
   floor: 'bg-green-100 text-green-800',
@@ -28,11 +30,11 @@ export const ROLE_COLORS: Record<string, string> = {
 }
 
 export function isAdmin(role: string) {
-  return ['gm', 'supervisor_floor', 'supervisor_bar'].includes(role)
+  return ['gm', 'admin', 'supervisor_floor', 'supervisor_bar'].includes(role)
 }
 
 export function isGM(role: string) {
-  return role === 'gm'
+  return role === 'gm' || role === 'admin'
 }
 
 export function isSupervisor(role: string) {

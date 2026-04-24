@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   if (!profile) redirect('/login')
   const weekStart = getCurrentWeekMonday()
-  const isAdmin = ['gm', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
+  const isAdmin = ['gm', 'admin', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
   const today = new Date().toISOString().slice(0, 10)
   const [
     { count: staffCount },
