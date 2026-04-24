@@ -7,11 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { cn, ROLE_LABELS, ROLE_COLORS } from '@/lib/utils'
-import {
-  Users, Settings, Calendar, CheckSquare, ArrowLeftRight,
-  CalendarOff, Plus, Edit2, UserX, UserCheck, ChevronDown,
-  ChevronUp, Check, X, Clock, Wand2, Eye
-} from 'lucide-react'
+import { Users, Settings, Calendar, CheckSquare, ArrowLeftRight, CalendarOff, Check, X, Clock, ChevronLeft, ChevronRight, AlertCircle, Eye } from 'lucide-react'
 import { format, addDays } from 'date-fns'
 
 const TABS = [
@@ -435,12 +431,12 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     <div className="space-y-4">
       <Card padding="sm">
         <div className="flex items-center justify-between p-2">
-          <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()-7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }} className="p-2 rounded-lg hover:bg-black/5">?</button>
+          <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()-7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }} className="w-9 h-9 rounded-xl bg-[#F7F0E8] hover:bg-black/10 flex items-center justify-center transition-colors"><ChevronLeft size={16}/></button>
           <div className="text-center">
             <p className="font-semibold text-sm text-[#323232]">Week of {format(new Date(weekStart+'T00:00:00'), 'MMM d')} - {format(addDays(new Date(weekStart+'T00:00:00'),6), 'MMM d, yyyy')}</p>
             <p className="text-xs text-gray-400">{weekSchedules.length} slots - {weekAvailability.length} availability entries</p>
           </div>
-          <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()+7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }} className="p-2 rounded-lg hover:bg-black/5">?</button>
+          <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()+7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }} className="w-9 h-9 rounded-xl bg-[#F7F0E8] hover:bg-black/10 flex items-center justify-center transition-colors"><ChevronRight size={16}/></button>
         </div>
       </Card>
 
@@ -487,13 +483,13 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
       {generatedSlots.length > 0 ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="bg-white rounded-2xl border border-black/5 p-4 flex items-center justify-between gap-4">
             <div>
-              <h3 className="font-semibold text-[#323232]">Schedule Preview</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Based on actual availability. Swap staff using dropdowns.</p>
+              <h3 className="font-bold text-[#323232]">Schedule Preview</h3>
+              <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use Swap dropdowns to override.</p>
             </div>
             <button onClick={saveSchedule} disabled={saving}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#FF6357] text-white text-sm font-semibold hover:bg-[#e5554a] transition-all disabled:opacity-50">
+              className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FF6357] text-white text-sm font-bold hover:bg-[#e5554a] transition-all disabled:opacity-50 shadow-sm">
               {saving ? 'Saving...' : 'Save and Submit'}
             </button>
           </div>
@@ -506,38 +502,43 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
               return Array.from(staffSet)
             })()
             return (
-              <div key={slot.key} className={cn('bg-white rounded-2xl border overflow-hidden', slot.issues?.length ? 'border-red-200' : 'border-black/5')}>
+              <div key={slot.key} className={cn('bg-white rounded-2xl overflow-hidden shadow-sm', slot.issues?.length ? 'ring-2 ring-red-200' : 'ring-1 ring-black/5')}>
                 {/* Day header */}
-                <div className={cn('px-5 py-3 flex items-center justify-between', slot.issues?.length ? 'bg-red-50' : isWeekend ? 'bg-orange-50' : 'bg-[#F7F0E8]')}>
+                <div className={cn('px-5 py-4 flex items-center justify-between', slot.issues?.length ? 'bg-red-50' : isWeekend ? 'bg-[#323232]' : 'bg-[#323232]')}>
                   <div className="flex items-center gap-3">
                     <div>
-                      <p className="font-bold text-[#323232]">{slot.day}</p>
-                      <p className="text-xs text-gray-400">{slot.date}</p>
+                      <p className="font-bold text-white text-lg">{slot.day}</p>
+                      <p className="text-xs text-white/50">{slot.date}</p>
                     </div>
-                    {isWeekend && <span className="text-xs px-2 py-0.5 rounded-full bg-orange-200 text-orange-700 font-medium">Full Rush Day</span>}
+                    {isWeekend && <span className="text-xs px-2.5 py-1 rounded-full bg-[#FF6357] text-white font-semibold">Full Rush</span>}
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-[#323232]">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
-                    <p className="text-xs text-gray-400">{slot.staff?.length || 0} staff assigned</p>
+                    <p className="text-base font-bold text-white">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
+                    <p className="text-xs text-white/50">{slot.staff?.length || 0} staff · {slot.issues?.length ? slot.issues.length + ' issue' + (slot.issues.length > 1 ? 's' : '') : 'all good'}</p>
                   </div>
                 </div>
                 {/* Rush band indicator for weekdays */}
                 {!isWeekend && (
-                  <div className="px-5 py-1.5 bg-white border-b border-black/5 flex items-center gap-2 text-xs text-gray-400">
-                    <div className="flex-1 h-1.5 rounded-full bg-blue-100 relative overflow-hidden">
-                      <div className="absolute h-full bg-orange-300 rounded-full"
-                        style={{left: ((slot.rushStartH - 8) / 16 * 100) + '%', width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%'}}/>
+                  <div className="px-5 py-2 bg-white border-b border-black/5 flex items-center gap-3">
+                    <div className="flex-1 h-2 rounded-full bg-gray-100 relative overflow-hidden">
+                      <div className="absolute h-full bg-blue-200 rounded-full" style={{left: '0%', width: ((slot.rushStartH - 8) / 16 * 100) + '%'}}/>
+                      <div className="absolute h-full bg-orange-300 rounded-full" style={{left: ((slot.rushStartH - 8) / 16 * 100) + '%', width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%'}}/>
+                      <div className="absolute h-full bg-blue-200 rounded-full" style={{left: ((slot.rushEndH - 8) / 16 * 100) + '%', width: ((24 - slot.rushEndH) / 16 * 100) + '%'}}/>
                     </div>
-                    <span className="whitespace-nowrap">Rush {fmtH(slot.rushStartH)}-{fmtH(slot.rushEndH)}</span>
+                    <div className="flex gap-3 text-xs whitespace-nowrap">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-200 inline-block"/>Off-rush</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-300 inline-block"/>Rush {fmtH(slot.rushStartH)}-{fmtH(slot.rushEndH)}</span>
+                    </div>
                   </div>
                 )}
-                {/* Staff rows */}
-                <div className="divide-y divide-black/5">
+                {/* Staff grid */}
+                <div className="p-4 grid grid-cols-2 gap-3">
                   {(slot.staff || []).map((member: any) => {
                     const s = STAFF_MAP[member.id]
                     if (!s) return null
                     const info = member.info
                     const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-purple-500' : 'bg-green-500'
+                    const roleBg = member.role === 'Supervisor' ? 'bg-blue-50 border-blue-100' : member.role === 'Bar' ? 'bg-purple-50 border-purple-100' : 'bg-green-50 border-green-100'
                     const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : 'text-green-600'
                     const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar'] : member.role === 'Bar' ? ['bar','supervisor_bar'] : ['floor','supervisor_floor']
                     const fieldName = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
@@ -550,25 +551,9 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                       (fieldName === 'floor_staff2_id' || sid !== slot.floor_staff2_id)
                     )
                     return (
-                      <div key={member.id} className="px-5 py-3 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
-                            {s.full_name?.charAt(0)}
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
-                            <p className={cn("text-xs font-medium", roleTextColor)}>{member.role}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          {info ? (
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-[#323232]">{fmtH(info.startH)} - {fmtH(info.endH)}</p>
-                              <p className="text-xs text-[#FF6357] font-medium">{info.totalH}h</p>
-                            </div>
-                          ) : (
-                            <p className="text-xs text-gray-400">Hours unknown</p>
-                          )}
+                      <div key={member.id} className={cn("rounded-2xl border p-3 flex flex-col gap-2", roleBg)}>
+                        <div className="flex items-center justify-between">
+                          <span className={cn("text-xs font-bold uppercase tracking-wide", roleTextColor)}>{member.role}</span>
                           {alts.length > 0 && (
                             <select value="" onChange={e => {
                               if (!e.target.value) return
@@ -580,7 +565,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 return { ...updated, staff: newStaff }
                               }))
                             }}
-                              className="text-xs border border-[#FF6357]/40 rounded-lg px-2 py-1 bg-white text-[#FF6357] cursor-pointer font-medium">
+                              className={cn("text-xs rounded-lg px-2 py-0.5 border cursor-pointer font-semibold bg-white", roleTextColor, "border-current/20")}>
                               <option value="">Swap</option>
                               {alts.map((sid: string) => (
                                 <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>
@@ -588,14 +573,28 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                             </select>
                           )}
                         </div>
+                        <div className="flex items-center gap-2">
+                          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
+                            {s.full_name?.charAt(0)}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-[#323232] truncate">{s.full_name?.split(' ')[0]}</p>
+                            {info ? (
+                              <p className="text-xs text-gray-500">{fmtH(info.startH)}-{fmtH(info.endH)} <span className="font-semibold text-[#FF6357]">{info.totalH}h</span></p>
+                            ) : (
+                              <p className="text-xs text-gray-400">-</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )
                   })}
                 </div>
                 {/* Issues */}
                 {slot.issues?.length > 0 && (
-                  <div className="px-5 py-2 bg-red-50 border-t border-red-100 flex items-center gap-2">
-                    <span className="text-xs text-red-500">{slot.issues.join(' - ')}</span>
+                  <div className="mx-4 mb-4 px-4 py-2.5 bg-red-50 border border-red-100 rounded-xl flex items-start gap-2">
+                    <AlertCircle size={14} className="text-red-400 flex-shrink-0 mt-0.5"/>
+                    <span className="text-xs text-red-500 font-medium">{slot.issues.join(' · ')}</span>
                   </div>
                 )}
               </div>
@@ -680,7 +679,7 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
             {pendingSwaps.map((swap: any) => (
               <div key={swap.id} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8]">
                 <div>
-                  <p className="text-sm font-medium text-[#323232]">{swap.staff_a?.full_name} ? {swap.staff_b?.full_name}</p>
+                  <p className="text-sm font-medium text-[#323232]">{swap.staff_a?.full_name} + {swap.staff_b?.full_name}</p>
                   <p className="text-xs text-gray-500">{swap.shift_date} - {swap.shift_label}</p>
                 </div>
                 <div className="flex gap-2">
