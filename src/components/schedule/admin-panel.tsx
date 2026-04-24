@@ -606,16 +606,14 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
         <button onClick={generateSchedule} disabled={generating}
           className="w-full py-4 rounded-2xl bg-[#323232] text-white font-semibold text-sm hover:bg-black transition-all disabled:opacity-50">
           {generating ? 'Generating...' : 'Auto-Generate Schedule from Availability'}
-          Auto-Generate Schedule from Availability
-          Auto-Generate Schedule from Availability
-          Auto-Generate Schedule from Availability
-        </Button>
+        </button>
       )}
     </div>
   )
 }
 
 function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPendingSwaps, pendingAttendance, setPendingAttendance, profile, supabase }: any) {
+
   const [loading, setLoading] = useState<string|null>(null)
   const isGM = profile.role === 'gm'
 
