@@ -6,17 +6,21 @@
   --color-brand-coral: #FF6357;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
 
-html, body {
-  max-width: 100vw;
-  overflow-x: hidden;
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
   background-color: #F7F0E8;
   color: #323232;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 :root {
@@ -27,13 +31,3 @@ html, body {
 
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-@media (min-width: 1024px) {
-  .sidebar-offset {
-    margin-left: 240px;
-  }
-}
-
-@media (min-width: 1024px) {
-  #main-content { margin-left: 240px !important; }
-}

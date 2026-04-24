@@ -8,23 +8,26 @@ interface CardProps {
 
 const paddings = {
   none: '',
-  sm: 'p-4',
+  sm: 'p-5',
   md: 'p-6',
   lg: 'p-8',
 }
 
 export function Card({ children, className, padding = 'md' }: CardProps) {
   return (
-    <div className={cn('bg-white rounded-2xl shadow-sm border border-black/5', paddings[padding], className)}>
+    <div className={cn(
+      'bg-white rounded-3xl border border-black/[0.06] shadow-[0_1px_4px_rgba(0,0,0,0.06)]',
+      paddings[padding], className
+    )}>
       {children}
     </div>
   )
 }
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn('flex items-center justify-between mb-4', className)}>{children}</div>
+  return <div className={cn('flex items-center justify-between mb-5', className)}>{children}</div>
 }
 
 export function CardTitle({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <h3 className={cn('text-base font-semibold text-[#323232]', className)}>{children}</h3>
+  return <h3 className={cn('text-base font-bold text-[#323232] tracking-tight', className)}>{children}</h3>
 }
