@@ -22,7 +22,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const supabase = createClient()
-  const isAdmin = ['gm', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
+  const isAdmin = ['gm', 'admin', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
   const nav = NAV.filter(n => !n.adminOnly || isAdmin)
 
   const signOut = async () => {
@@ -31,39 +31,54 @@ export function Sidebar({ profile }: { profile: Profile }) {
   }
 
   const Inner = () => (
-    <div className="flex flex-col h-full bg-white border-r border-black/5">
-      <div style={{backgroundColor: '#323232', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)'}}>
-        <img src="/images/logo.png" alt="DjLab Cafe" style={{height: '44px', width: 'auto', objectFit: 'contain'}}/>
+    <div className="flex flex-col h-full" style={{backgroundColor: '#323232'}}>
+      {/* Logo */}
+      <div style={{padding: '24px 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid rgba(247,240,232,0.08)'}}>
+        <img src="/images/logo.png" alt="DjLab Cafe" style={{height: '40px', width: 'auto', objectFit: 'contain'}}/>
       </div>
-      <div className="p-3 border-b border-black/5">
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-[#F7F0E8]">
-          <div className="w-8 h-8 rounded-full bg-[#323232] flex items-center justify-center flex-shrink-0">
-            <span className="text-white text-xs font-bold">{profile.full_name?.charAt(0)?.toUpperCase()}</span>
+      {/* Profile */}
+      <div style={{padding: '16px 12px', borderBottom: '1px solid rgba(247,240,232,0.08)'}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '16px', backgroundColor: 'rgba(247,240,232,0.07)'}}>
+          <div style={{width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#FF6357', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+            <span style={{color: 'white', fontSize: '14px', fontWeight: '700'}}>{profile.full_name?.charAt(0)?.toUpperCase()}</span>
           </div>
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#323232] truncate">{profile.full_name}</p>
-            <p className="text-xs text-gray-400 capitalize">{profile.role.replace(/_/g, ' ')}</p>
+          <div style={{minWidth: 0}}>
+            <p style={{color: '#F7F0E8', fontSize: '13px', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{profile.full_name}</p>
+            <p style={{color: 'rgba(247,240,232,0.4)', fontSize: '11px', textTransform: 'capitalize'}}>{profile.role.replace(/_/g, ' ')}</p>
           </div>
         </div>
       </div>
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
+      {/* Nav */}
+      <nav style={{flex: 1, padding: '12px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px'}}>
         {nav.map(item => {
           const Icon = item.icon
           const active = pathname === item.href || pathname.startsWith(item.href + '/')
           return (
             <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
-              className={cn('flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
-                active ? 'bg-[#FF6357] text-white shadow-sm' : 'text-gray-500 hover:bg-[#F7F0E8] hover:text-[#323232]'
-              )}>
-              <Icon size={17} className="flex-shrink-0"/>
+              style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                padding: '10px 12px', borderRadius: '14px',
+                fontSize: '13px', fontWeight: active ? '600' : '500',
+                color: active ? '#F7F0E8' : 'rgba(247,240,232,0.45)',
+                backgroundColor: active ? '#FF6357' : 'transparent',
+                transition: 'all 0.15s', textDecoration: 'none',
+                boxShadow: active ? '0 2px 8px rgba(255,99,87,0.35)' : 'none',
+              }}
+              onMouseEnter={e => { if (!active) (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(247,240,232,0.08)'; (e.currentTarget as HTMLElement).style.color = '#F7F0E8' }}
+              onMouseLeave={e => { if (!active) { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'rgba(247,240,232,0.45)' } }}
+            >
+              <Icon size={16} style={{flexShrink: 0}}/>
               {item.label}
             </Link>
           )
         })}
       </nav>
-      <div className="p-3 border-t border-black/5">
-        <button onClick={signOut} className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all w-full">
-          <LogOut size={17} className="flex-shrink-0"/>
+      {/* Sign out */}
+      <div style={{padding: '12px', borderTop: '1px solid rgba(247,240,232,0.08)'}}>
+        <button onClick={signOut} style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '14px', fontSize: '13px', fontWeight: '500', color: 'rgba(247,240,232,0.35)', backgroundColor: 'transparent', border: 'none', cursor: 'pointer', width: '100%', transition: 'all 0.15s'}}
+          onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'rgba(255,99,87,0.12)'; (e.currentTarget as HTMLElement).style.color = '#FF6357' }}
+          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; (e.currentTarget as HTMLElement).style.color = 'rgba(247,240,232,0.35)' }}>
+          <LogOut size={16} style={{flexShrink: 0}}/>
           Sign Out
         </button>
       </div>
@@ -72,12 +87,10 @@ export function Sidebar({ profile }: { profile: Profile }) {
 
   return (
     <>
-      <button onClick={() => setOpen(!open)} className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-white rounded-xl shadow-md border border-black/5 flex items-center justify-center">
+      <button onClick={() => setOpen(!open)} className="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 rounded-2xl shadow-lg flex items-center justify-center" style={{backgroundColor: '#323232', border: '1px solid rgba(247,240,232,0.1)', color: '#F7F0E8'}}>
         {open ? <X size={18}/> : <Menu size={18}/>}
       </button>
-      {open && (
-        <div className="lg:hidden fixed inset-0 bg-black/30 z-40 backdrop-blur-sm" onClick={() => setOpen(false)}/>
-      )}
+      {open && <div className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm" onClick={() => setOpen(false)}/>}
       <aside className="hidden lg:flex lg:flex-col fixed left-0 top-0 h-full w-60 z-30">
         <Inner/>
       </aside>

@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -23,31 +22,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{backgroundColor:'#2a2a2a', borderRadius:'24px', padding:'32px', border:'1px solid rgba(255,255,255,0.08)', boxShadow:'0 25px 50px rgba(0,0,0,0.5)'}}>
-      <h2 style={{color:'white', fontSize:'22px', fontWeight:'700', marginBottom:'4px'}}>Welcome back</h2>
-      <p style={{color:'rgba(255,255,255,0.4)', fontSize:'14px', marginBottom:'28px'}}>Sign in to your account</p>
-      <form onSubmit={handleLogin} style={{display:'flex', flexDirection:'column', gap:'16px'}}>
+    <div style={{backgroundColor: '#2d2d2d', borderRadius: '28px', padding: '36px', border: '1px solid rgba(247,240,232,0.08)', boxShadow: '0 32px 64px rgba(0,0,0,0.5)'}}>
+      <h2 style={{color: '#F7F0E8', fontSize: '24px', fontWeight: '800', marginBottom: '4px', letterSpacing: '-0.02em'}}>Welcome back</h2>
+      <p style={{color: 'rgba(247,240,232,0.35)', fontSize: '14px', marginBottom: '32px'}}>Sign in to your account</p>
+      <form onSubmit={handleLogin} style={{display: 'flex', flexDirection: 'column', gap: '16px'}}>
         <div>
-          <label style={{color:'rgba(255,255,255,0.6)', fontSize:'13px', fontWeight:'500', display:'block', marginBottom:'6px'}}>Email address</label>
+          <label style={{color: 'rgba(247,240,232,0.55)', fontSize: '12px', fontWeight: '600', display: 'block', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em'}}>Email</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@djlab.com" required autoComplete="email"
-            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'1px solid rgba(255,255,255,0.1)', backgroundColor:'rgba(255,255,255,0.06)', color:'white', fontSize:'14px', outline:'none', boxSizing:'border-box'}}
-            onFocus={e => e.target.style.borderColor='#FF6357'} onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.1)'}/>
+            style={{width: '100%', padding: '14px 16px', borderRadius: '16px', border: '1.5px solid rgba(247,240,232,0.1)', backgroundColor: 'rgba(247,240,232,0.05)', color: '#F7F0E8', fontSize: '14px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s'}}
+            onFocus={e => e.target.style.borderColor = '#FF6357'} onBlur={e => e.target.style.borderColor = 'rgba(247,240,232,0.1)'}/>
         </div>
         <div>
-          <label style={{color:'rgba(255,255,255,0.6)', fontSize:'13px', fontWeight:'500', display:'block', marginBottom:'6px'}}>Password</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" required autoComplete="current-password"
-            style={{width:'100%', padding:'12px 16px', borderRadius:'12px', border:'1px solid rgba(255,255,255,0.1)', backgroundColor:'rgba(255,255,255,0.06)', color:'white', fontSize:'14px', outline:'none', boxSizing:'border-box'}}
-            onFocus={e => e.target.style.borderColor='#FF6357'} onBlur={e => e.target.style.borderColor='rgba(255,255,255,0.1)'}/>
+          <label style={{color: 'rgba(247,240,232,0.55)', fontSize: '12px', fontWeight: '600', display: 'block', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.06em'}}>Password</label>
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required autoComplete="current-password"
+            style={{width: '100%', padding: '14px 16px', borderRadius: '16px', border: '1.5px solid rgba(247,240,232,0.1)', backgroundColor: 'rgba(247,240,232,0.05)', color: '#F7F0E8', fontSize: '14px', outline: 'none', boxSizing: 'border-box', transition: 'border-color 0.15s'}}
+            onFocus={e => e.target.style.borderColor = '#FF6357'} onBlur={e => e.target.style.borderColor = 'rgba(247,240,232,0.1)'}/>
         </div>
-        {error && <div style={{padding:'12px 16px', borderRadius:'12px', backgroundColor:'rgba(255,99,87,0.15)', border:'1px solid rgba(255,99,87,0.3)', color:'#FF6357', fontSize:'13px'}}>{error}</div>}
+        {error && <div style={{padding: '12px 16px', borderRadius: '14px', backgroundColor: 'rgba(255,99,87,0.12)', border: '1px solid rgba(255,99,87,0.25)', color: '#FF6357', fontSize: '13px'}}>{error}</div>}
         <button type="submit" disabled={loading}
-          style={{width:'100%', padding:'14px', borderRadius:'12px', backgroundColor:'#FF6357', color:'white', fontWeight:'700', fontSize:'15px', border:'none', cursor:loading?'not-allowed':'pointer', opacity:loading?0.7:1, transition:'all 0.2s', marginTop:'4px'}}>
+          style={{width: '100%', padding: '15px', borderRadius: '16px', backgroundColor: '#FF6357', color: '#F7F0E8', fontWeight: '700', fontSize: '15px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1, transition: 'all 0.15s', marginTop: '4px', letterSpacing: '-0.01em', boxShadow: '0 4px 16px rgba(255,99,87,0.4)'}}>
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
-      <p style={{textAlign:'center', color:'rgba(255,255,255,0.35)', fontSize:'13px', marginTop:'24px'}}>
+      <p style={{textAlign: 'center', color: 'rgba(247,240,232,0.3)', fontSize: '13px', marginTop: '28px'}}>
         {"Don't have an account? "}
-        <a href="/register" style={{color:'#FF6357', fontWeight:'600', textDecoration:'none'}}>Register</a>
+        <a href="/register" style={{color: '#FF6357', fontWeight: '600', textDecoration: 'none'}}>Register</a>
       </p>
     </div>
   )
