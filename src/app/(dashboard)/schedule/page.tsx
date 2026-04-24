@@ -8,7 +8,7 @@ export default async function SchedulePage() {
   if (!user) redirect('/login')
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   if (!profile) redirect('/login')
-  const isAdmin = ['gm', 'admin', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
+  const isAdmin = ['gm', 'supervisor_floor', 'supervisor_bar'].includes(profile.role) || profile.is_admin === true
   const query = supabase
     .from('schedules')
     .select('*, supervisor:supervisor_id(id,full_name,role), bar_staff:bar_staff_id(id,full_name,role), floor_staff1:floor_staff1_id(id,full_name,role), floor_staff2:floor_staff2_id(id,full_name,role)')

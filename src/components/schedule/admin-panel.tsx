@@ -23,7 +23,6 @@ const ROLE_OPTIONS = [
   { value: 'bar', label: 'Bar Staff' },
   { value: 'supervisor_floor', label: 'Supervisor (Floor)' },
   { value: 'supervisor_bar', label: 'Supervisor (Bar)' },
-  { value: 'admin', label: 'Admin' },
   { value: 'gm', label: 'General Manager' },
 ]
 
@@ -156,7 +155,7 @@ function StaffTab({ staff, setStaff, profile, supabase }: any) {
   const [form, setForm] = useState({ full_name: '', email: '', role: 'floor', phone: '', notes: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const isGM = ['gm','admin'].includes(profile.role)
+  const isGM = profile.role === 'gm' || profile.is_admin === true
 
   const toggleActive = async (id: string, current: boolean) => {
     const { data } = await supabase.from('profiles').update({
@@ -237,7 +236,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
   const [saving, setSaving] = useState(false)
   const [generatedSlots, setGeneratedSlots] = useState<any[]>([])
   const [editSlot, setEditSlot] = useState<string|null>(null)
-  const isGM = ['gm','admin'].includes(profile.role)
+  const isGM = profile.role === 'gm' || profile.is_admin === true
 
   const activeStaff = staff.filter((s: any) => s.active && s.role !== 'gm')
   const STAFF_MAP = Object.fromEntries(activeStaff.map((s: any) => [s.id, s]))
@@ -623,7 +622,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPendingSwaps, pendingAttendance, setPendingAttendance, profile, supabase }: any) {
 
   const [loading, setLoading] = useState<string|null>(null)
-  const isGM = ['gm','admin'].includes(profile.role)
+  const isGM = profile.role === 'gm' || profile.is_admin === true
 
   const approveDayOff = async (id: string, action: 'approve'|'deny') => {
     setLoading(id+action)
@@ -728,7 +727,7 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
 function SettingsTab({ rushConfig, setRushConfig, profile, supabase }: any) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const isGM = ['gm','admin'].includes(profile.role)
+  const isGM = profile.role === 'gm' || profile.is_admin === true
   const weekday = rushConfig.find((r: any) => r.day_type === 'weekday') || { rush_start: '15:00', rush_end: '21:00' }
   const weekend = rushConfig.find((r: any) => r.day_type === 'weekend') || { rush_start: '08:00', rush_end: '00:00' }
   const [wdStart, setWdStart] = useState(weekday.rush_start)
