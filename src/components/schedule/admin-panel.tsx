@@ -309,7 +309,16 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       const dateStr = format(date, 'yyyy-MM-dd')
       const isWeekend = i >= 5
       const availStaff = getAvailableStaff(dateStr)
-      if (!availStaff.length) return
+
+      // If no staff at all, push empty day
+      if (!availStaff.length) {
+        built.push({ key: day + '_day', date: dateStr, day, label: day, type: isWeekend ? 'rush' : 'mixed',
+          start: '08:00', end: '00:00', startH: 8, endH: 24,
+          supervisor_id: null, bar_staff_id: null, floor_staff1_id: null, floor_staff2_id: null,
+          issues: ['No staff availability submitted for this day'],
+          staff: [], rushStartH, rushEndH, isWeekend, fmtH: (h: number) => { if (h === 0 || h === 24) return '12am'; if (h < 12) return h + 'am'; if (h === 12) return '12pm'; return (h-12) + 'pm' }, status: 'flagged' })
+        return
+      }
 
       // Separate by role
       const availSups = byLeast(availStaff.filter((id: string) => supRoles.includes(STAFF_MAP[id]?.role)))
