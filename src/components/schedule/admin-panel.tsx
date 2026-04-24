@@ -430,7 +430,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
   return (
     <div className="space-y-4">
       <Card padding="sm">
-        <div className="flex items-center justify-between p-2">
+        <div className="flex items-center justify-between p-3">
           <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()-7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }} className="w-9 h-9 rounded-xl bg-[#F7F0E8] hover:bg-black/10 flex items-center justify-center transition-colors"><ChevronLeft size={16}/></button>
           <div className="text-center">
             <p className="font-semibold text-sm text-[#323232]">Week of {format(new Date(weekStart+'T00:00:00'), 'MMM d')} - {format(addDays(new Date(weekStart+'T00:00:00'),6), 'MMM d, yyyy')}</p>
@@ -482,8 +482,8 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       )}
 
       {generatedSlots.length > 0 ? (
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-black/5 p-4 flex items-center justify-between gap-4">
+        <div className="space-y-5">
+          <div className="bg-white rounded-2xl border border-black/5 p-5 flex items-center justify-between gap-6">
             <div>
               <h3 className="font-bold text-[#323232]">Schedule Preview</h3>
               <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use Swap dropdowns to override.</p>
@@ -504,7 +504,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
             return (
               <div key={slot.key} className={cn('bg-white rounded-2xl overflow-hidden shadow-sm', slot.issues?.length ? 'ring-2 ring-red-200' : 'ring-1 ring-black/5')}>
                 {/* Day header */}
-                <div className={cn('px-5 py-4 flex items-center justify-between', slot.issues?.length ? 'bg-red-50' : isWeekend ? 'bg-[#323232]' : 'bg-[#323232]')}>
+                <div className={cn('px-6 py-5 flex items-center justify-between', slot.issues?.length ? 'bg-red-800' : 'bg-[#323232]')}>
                   <div className="flex items-center gap-3">
                     <div>
                       <p className="font-bold text-white text-lg">{slot.day}</p>
@@ -519,7 +519,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                 </div>
                 {/* Rush band indicator for weekdays */}
                 {!isWeekend && (
-                  <div className="px-5 py-2 bg-white border-b border-black/5 flex items-center gap-3">
+                  <div className="px-6 py-3 bg-white border-b border-black/5 flex items-center gap-4">
                     <div className="flex-1 h-2 rounded-full bg-gray-100 relative overflow-hidden">
                       <div className="absolute h-full bg-blue-200 rounded-full" style={{left: '0%', width: ((slot.rushStartH - 8) / 16 * 100) + '%'}}/>
                       <div className="absolute h-full bg-orange-300 rounded-full" style={{left: ((slot.rushStartH - 8) / 16 * 100) + '%', width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%'}}/>
@@ -532,7 +532,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                   </div>
                 )}
                 {/* Staff grid */}
-                <div className="p-4 grid grid-cols-2 gap-3">
+                <div className="p-5 grid grid-cols-2 gap-4">
                   {(slot.staff || []).map((member: any) => {
                     const s = STAFF_MAP[member.id]
                     if (!s) return null
@@ -551,7 +551,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                       (fieldName === 'floor_staff2_id' || sid !== slot.floor_staff2_id)
                     )
                     return (
-                      <div key={member.id} className={cn("rounded-2xl border p-3 flex flex-col gap-2", roleBg)}>
+                      <div key={member.id} className={cn("rounded-2xl border p-4 flex flex-col gap-3", roleBg)}>
                         <div className="flex items-center justify-between">
                           <span className={cn("text-xs font-bold uppercase tracking-wide", roleTextColor)}>{member.role}</span>
                           {alts.length > 0 && (
@@ -592,7 +592,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                 </div>
                 {/* Issues */}
                 {slot.issues?.length > 0 && (
-                  <div className="mx-4 mb-4 px-4 py-2.5 bg-red-50 border border-red-100 rounded-xl flex items-start gap-2">
+                  <div className="mx-5 mb-5 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-2">
                     <AlertCircle size={14} className="text-red-400 flex-shrink-0 mt-0.5"/>
                     <span className="text-xs text-red-500 font-medium">{slot.issues.join(' · ')}</span>
                   </div>
