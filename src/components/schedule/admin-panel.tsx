@@ -499,7 +499,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       )}
 
       {generatedSlots.length > 0 ? (
-        <div className="space-y-5">
+        <div className="space-y-8">
           <div className="bg-white rounded-2xl border border-black/5 p-5 flex items-center justify-between gap-6">
             <div>
               <h3 className="font-bold text-[#323232]">Schedule Preview</h3>
@@ -521,22 +521,22 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
             return (
               <div key={slot.key} className={cn('bg-white rounded-2xl overflow-hidden shadow-sm', slot.issues?.length ? 'ring-2 ring-red-200' : 'ring-1 ring-black/5')}>
                 {/* Day header */}
-                <div className={cn('px-6 py-5 flex items-center justify-between', slot.issues?.length ? 'bg-red-800' : 'bg-[#323232]')}>
+                <div className={cn('px-8 py-6 flex items-center justify-between', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')}>
                   <div className="flex items-center gap-3">
                     <div>
-                      <p className="font-bold text-white text-lg">{slot.day}</p>
+                      <p className="font-black text-white text-2xl">{slot.day}</p>
                       <p className="text-xs text-white/50">{slot.date}</p>
                     </div>
                     {isWeekend && <span className="text-xs px-2.5 py-1 rounded-full bg-[#FF6357] text-white font-semibold">Full Rush</span>}
                   </div>
                   <div className="text-right">
-                    <p className="text-base font-bold text-white">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
+                    <p className="text-xl font-black text-white">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
                     <p className="text-xs text-white/50">{slot.staff?.length || 0} staff · {slot.issues?.length ? slot.issues.length + ' issue' + (slot.issues.length > 1 ? 's' : '') : 'all good'}</p>
                   </div>
                 </div>
                 {/* Rush band indicator for weekdays */}
                 {!isWeekend && (
-                  <div className="px-6 py-3 bg-white border-b border-black/5 flex items-center gap-4">
+                  <div className="px-8 py-4 bg-[#F7F0E8] border-b border-black/5 flex items-center gap-6">
                     <div className="flex-1 h-2 rounded-full bg-gray-100 relative overflow-hidden">
                       <div className="absolute h-full bg-blue-200 rounded-full" style={{left: '0%', width: ((slot.rushStartH - 8) / 16 * 100) + '%'}}/>
                       <div className="absolute h-full bg-orange-300 rounded-full" style={{left: ((slot.rushStartH - 8) / 16 * 100) + '%', width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%'}}/>
@@ -549,7 +549,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                   </div>
                 )}
                 {/* Staff grid */}
-                <div className="p-5 grid grid-cols-2 gap-4">
+                <div className="px-6 py-4 space-y-3">
                   {(slot.staff || []).map((member: any) => {
                     const s = STAFF_MAP[member.id]
                     if (!s) return null
@@ -568,48 +568,48 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                       (fieldName === 'floor_staff2_id' || sid !== slot.floor_staff2_id)
                     )
                     return (
-                      <div key={member.id} className={cn("rounded-2xl border p-4 flex flex-col gap-3", roleBg)}>
-                        <div className="flex items-center justify-between">
-                          <span className={cn("text-xs font-bold uppercase tracking-wide", roleTextColor)}>{member.role}</span>
-                          {alts.length > 0 && (
-                            <select value="" onChange={e => {
-                              if (!e.target.value) return
-                              const newId = e.target.value
-                              setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
-                                if (gs.key !== slot.key) return gs
-                                const updated = { ...gs, [fieldName]: newId }
-                                const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, id: newId, info: null } : m)
-                                return { ...updated, staff: newStaff }
-                              }))
-                            }}
-                              className={cn("text-xs rounded-lg px-2 py-0.5 border cursor-pointer font-semibold bg-white", roleTextColor, "border-current/20")}>
-                              <option value="">Swap</option>
-                              {alts.map((sid: string) => (
-                                <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>
-                              ))}
-                            </select>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
+                      <div key={member.id} className={cn("rounded-2xl border px-5 py-4 flex items-center justify-between gap-4", roleBg)}>
+                        <div className="flex items-center gap-4">
+                          <div className={cn("w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold flex-shrink-0", roleColor)}>
                             {s.full_name?.charAt(0)}
                           </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold text-[#323232] truncate">{s.full_name?.split(' ')[0]}</p>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-base font-bold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
+                              <span className={cn("text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full", roleBg, roleTextColor, "border")}>{member.role}</span>
+                            </div>
                             {info ? (
-                              <p className="text-xs text-gray-500">{fmtH(info.startH)}-{fmtH(info.endH)} <span className="font-semibold text-[#FF6357]">{info.totalH}h</span></p>
+                              <p className="text-sm text-gray-500 mt-0.5">{fmtH(info.startH)} - {fmtH(info.endH)} <span className="font-bold text-[#FF6357] ml-1">{info.totalH}h</span></p>
                             ) : (
-                              <p className="text-xs text-gray-400">-</p>
+                              <p className="text-sm text-gray-400 mt-0.5">Hours unknown</p>
                             )}
                           </div>
                         </div>
+                        {alts.length > 0 && (
+                          <select value="" onChange={e => {
+                            if (!e.target.value) return
+                            const newId = e.target.value
+                            setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
+                              if (gs.key !== slot.key) return gs
+                              const updated = { ...gs, [fieldName]: newId }
+                              const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, id: newId, info: null } : m)
+                              return { ...updated, staff: newStaff }
+                            }))
+                          }}
+                            className={cn("text-sm rounded-xl px-3 py-1.5 border-2 cursor-pointer font-bold bg-white flex-shrink-0", roleTextColor, "border-current/30 hover:border-current/60 transition-colors")}>
+                            <option value="">Swap</option>
+                            {alts.map((sid: string) => (
+                              <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>
+                            ))}
+                          </select>
+                        )}
                       </div>
                     )
                   })}
                 </div>
                 {/* Issues */}
                 {slot.issues?.length > 0 && (
-                  <div className="mx-5 mb-5 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-2">
+                  <div className="mx-6 mb-6 px-5 py-4 bg-red-50 border border-red-100 rounded-2xl flex items-start gap-3">
                     <AlertCircle size={14} className="text-red-400 flex-shrink-0 mt-0.5"/>
                     <span className="text-xs text-red-500 font-medium">{slot.issues.join(' · ')}</span>
                   </div>
