@@ -30,7 +30,6 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
 
   const fmtH = (t: string) => {
     if (!t) return ''
-    if (t === '00:00') return '12am'
     const h = parseInt(t.split(':')[0])
     if (h === 0) return '12am'
     if (h < 12) return h + 'am'
@@ -39,8 +38,10 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
   }
 
   const timeToH = (t: string) => {
-    if (!t || t === '00:00') return 24
-    return parseInt(t.split(':')[0])
+    if (!t) return 24
+    const h = parseInt(t.split(':')[0])
+    if (h === 0) return 24
+    return h
   }
 
   const getStaff = (slot: any) => [
