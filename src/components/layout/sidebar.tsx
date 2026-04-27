@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Calendar, Clock, ArrowLeftRight, CalendarOff, CheckSquare, Settings, LogOut, Menu, X } from 'lucide-react'
+import { LayoutDashboard, Calendar, Clock, ArrowLeftRight, CalendarOff, CheckSquare, Settings, LogOut, Menu, X, User } from 'lucide-react'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import type { Profile } from '@/types'
@@ -14,6 +14,7 @@ const NAV = [
   { href: '/swaps', label: 'Swaps', icon: ArrowLeftRight },
   { href: '/days-off', label: 'Days Off', icon: CalendarOff },
   { href: '/attendance', label: 'Attendance', icon: CheckSquare },
+  { href: '/settings', label: 'Settings', icon: User },
   { href: '/admin', label: 'Admin', icon: Settings, adminOnly: true },
 ]
 
