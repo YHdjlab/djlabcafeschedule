@@ -608,7 +608,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                   {/* Staff hours fill */}
                                   <div className="absolute h-full rounded-full transition-all duration-500" style={{
                                     left: Math.max(0, (info.startH - 8) / 16 * 100) + '%',
-                                    width: Math.min(100, (info.totalH / 16 * 100)) + '%',
+                                    width: Math.min(100 - Math.max(0, (info.startH - 8) / 16 * 100), (info.totalH / 16 * 100)) + '%',
                                     backgroundColor: member.role === 'Supervisor' ? '#3B82F6' : member.role === 'Bar' ? '#A855F7' : '#22C55E',
                                     opacity: 0.85
                                   }}/>
