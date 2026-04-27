@@ -268,8 +268,8 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     const rushStartH = parseInt((weekdayConfig?.rush_start || '15:00').split(':')[0])
     const rushEndH = parseInt((weekdayConfig?.rush_end || '21:00').split(':')[0])
 
-    const supRoles = ['supervisor_floor','supervisor_bar']
-    const floorRoles = ['floor','supervisor_floor']
+    const supRoles = ['supervisor_floor','supervisor_bar','admin']
+    const floorRoles = ['floor','supervisor_floor','admin']
     const barRoles = ['bar','supervisor_bar']
 
     // Get actual available hours for a staff member on a date
