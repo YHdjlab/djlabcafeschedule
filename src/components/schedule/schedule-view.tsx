@@ -156,14 +156,20 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
                             <div className="relative h-5 rounded-full overflow-hidden" style={{backgroundColor: 'rgba(0,0,0,0.06)'}}>
                               <div className="absolute h-full opacity-25 rounded-full" style={{left: ((15-8)/16*100)+'%', width: ((21-15)/16*100)+'%', backgroundColor: '#FB923C'}}/>
                               <div className="absolute h-full rounded-full transition-all" style={{
-                                left: Math.max(0,(startH-8)/16*100)+'%',
-                                width: Math.min(100,(endH-startH)/16*100)+'%',
+                                left: Math.max(0, (startH - 8) / 16 * 100) + '%',
+                                width: Math.min(100 - Math.max(0, (startH - 8) / 16 * 100), (endH - startH) / 16 * 100) + '%',
                                 backgroundColor: s.isMe ? '#FF6357' : s.color,
-                                opacity: 0.85
+                                opacity: 0.9
                               }}/>
-                              <div className="absolute inset-0 flex items-center px-2 justify-between pointer-events-none">
-                                <span className="text-white font-bold drop-shadow" style={{fontSize:'10px'}}>{fmtH(slot.start_time)}</span>
-                                <span className="text-white font-bold drop-shadow" style={{fontSize:'10px'}}>{fmtH(slot.end_time)}</span>
+                              {/* start/end labels positioned at actual bar location */}
+                              <div className="absolute inset-y-0 flex items-center pointer-events-none" style={{
+                                left: Math.max(0, (startH - 8) / 16 * 100) + '%',
+                                width: Math.min(100 - Math.max(0, (startH - 8) / 16 * 100), (endH - startH) / 16 * 100) + '%',
+                              }}>
+                                <div className="w-full flex items-center justify-between px-2">
+                                  <span className="text-white font-bold drop-shadow" style={{fontSize:'10px'}}>{fmtH(slot.start_time)}</span>
+                                  <span className="text-white font-bold drop-shadow" style={{fontSize:'10px'}}>{fmtH(slot.end_time)}</span>
+                                </div>
                               </div>
                             </div>
                             {/* Hour markers */}
