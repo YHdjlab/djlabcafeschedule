@@ -380,6 +380,12 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
       const fmtH = (h: number) => { if (h === 0 || h === 24) return '12am'; if (h < 12) return h + 'am'; if (h === 12) return '12pm'; return (h-12) + 'pm' }
 
+      // Find bench staff - available but not assigned
+      const assignedIds = new Set([supervisor_id, bar_staff_id, floor_staff1_id, floor_staff2_id].filter(Boolean))
+      const benchStaff = availStaff
+        .filter((id: string) => !assignedIds.has(id))
+        .map((id: string) => ({ id, role: 'Available', info: getStaffHours(id, dateStr) }))
+
       built.push({
         key: day + '_day',
         date: dateStr,
@@ -397,6 +403,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
           bar_staff_id && { id: bar_staff_id, role: 'Bar', info: barInfo },
           floor_staff1_id && { id: floor_staff1_id, role: 'Floor', info: floor1Info },
           floor_staff2_id && { id: floor_staff2_id, role: 'Floor', info: floor2Info },
+          ...benchStaff,
         ].filter(Boolean),
         rushStartH, rushEndH, isWeekend, fmtH,
         status: issues.length ? 'flagged' : 'draft'
@@ -561,9 +568,9 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                     const s = STAFF_MAP[member.id]
                     if (!s) return null
                     const info = member.info
-                    const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-purple-500' : 'bg-green-500'
-                    const roleBg = member.role === 'Supervisor' ? 'bg-blue-50 border-blue-100' : member.role === 'Bar' ? 'bg-purple-50 border-purple-100' : 'bg-green-50 border-green-100'
-                    const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : 'text-green-600'
+                    const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-purple-500' : member.role === 'Available' ? 'bg-gray-400' : 'bg-green-500'
+                    const roleBg = member.role === 'Supervisor' ? 'bg-blue-50 border-blue-100' : member.role === 'Bar' ? 'bg-purple-50 border-purple-100' : member.role === 'Available' ? 'bg-gray-50 border-gray-200' : 'bg-green-50 border-green-100'
+                    const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : member.role === 'Available' ? 'text-gray-500' : 'text-green-600'
                     const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar'] : member.role === 'Bar' ? ['bar','supervisor_bar'] : ['floor','supervisor_floor']
                     const fieldName = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
                     const alts = slotAvail.filter((sid: string) => {
