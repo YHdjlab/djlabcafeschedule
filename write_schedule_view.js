@@ -1,4 +1,6 @@
-'use client'
+const fs = require("fs");
+
+const content = `'use client'
 import { useState, useMemo } from 'react'
 import { cn } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
@@ -136,8 +138,8 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
                     {staff.map((s: any, i: number) => (
                       <div key={i} className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4"
                         style={{
-                          backgroundColor: s.isMe ? 'rgba(255,99,87,0.06)' : `${s.color}10`,
-                          border: `1px solid ${s.isMe ? 'rgba(255,99,87,0.2)' : s.color + '20'}`,
+                          backgroundColor: s.isMe ? 'rgba(255,99,87,0.06)' : \`\${s.color}10\`,
+                          border: \`1px solid \${s.isMe ? 'rgba(255,99,87,0.2)' : s.color + '20'}\`,
                           outline: s.isMe ? '2px solid #FF6357' : 'none'
                         }}>
                         <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -148,7 +150,7 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
                               <p className="text-base font-bold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
-                              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{color: s.isMe ? '#FF6357' : s.color, backgroundColor: s.isMe ? 'rgba(255,99,87,0.1)' : `${s.color}15`}}>{s.role}</span>
+                              <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{color: s.isMe ? '#FF6357' : s.color, backgroundColor: s.isMe ? 'rgba(255,99,87,0.1)' : \`\${s.color}15\`}}>{s.role}</span>
                               {s.isMe && <span className="text-xs font-bold text-[#FF6357]">You</span>}
                               <span className="text-xs font-bold text-[#FF6357] ml-auto">{endH - startH}h</span>
                             </div>
@@ -194,3 +196,7 @@ export function ScheduleView({ schedules, profile, isAdmin }: ScheduleViewProps)
     </div>
   )
 }
+`;
+
+fs.writeFileSync("src/components/schedule/schedule-view.tsx", content, "utf8");
+console.log("Done");
