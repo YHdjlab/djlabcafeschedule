@@ -28,11 +28,11 @@ export const ROLE_COLORS: Record<string, string> = {
 }
 
 export function isAdmin(role: string, is_admin?: boolean) {
-  return is_admin === true || ['gm', 'supervisor_floor', 'supervisor_bar'].includes(role)
+  return is_admin === true || ['gm', 'admin', 'supervisor_floor', 'supervisor_bar'].includes(role)
 }
 
 export function isGM(role: string, is_admin?: boolean) {
-  return role === 'gm' || is_admin === true
+  return role === 'gm' || role === 'admin' || is_admin === true
 }
 
 export function isSupervisor(role: string) {

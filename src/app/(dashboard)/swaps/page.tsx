@@ -8,7 +8,7 @@ export default async function SwapsPage() {
   if (!user) redirect('/login')
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
   if (!profile) redirect('/login')
-  const isAdmin = ['gm','supervisor_floor','supervisor_bar'].includes(profile.role)
+  const isAdmin = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role)
   let swapsQuery = supabase
     .from('swap_requests')
     .select('*, staff_a:staff_a_id(id,full_name,role), staff_b:staff_b_id(id,full_name,role)')
