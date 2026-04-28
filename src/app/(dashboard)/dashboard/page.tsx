@@ -55,7 +55,7 @@ export default async function DashboardPage() {
             </div>
           </div>
           {isAdmin && totalPending > 0 && (
-            <Link href="/admin" className="flex-shrink-0 flex items-center gap-2 bg-[#FF6357] hover:bg-[#e5554a] text-white px-4 py-2.5 rounded-2xl text-sm font-semibold transition-all">
+            <Link href="/admin" className="flex-shrink-0 flex items-center gap-2 bg-[#FF6357] hover:bg-[#e5554a] text-white px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all whitespace-nowrap shadow-sm">
               <Bell size={14}/>{totalPending} pending
             </Link>
           )}

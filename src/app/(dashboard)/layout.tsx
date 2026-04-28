@@ -11,11 +11,11 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen bg-[#F7F0E8]">
       <Sidebar profile={profile}/>
-      <main className="min-h-screen hidden lg:block" style={{marginLeft:"240px", maxWidth:"calc(100% - 240px)"}}>
-        <div style={{padding:"36px 48px 60px 40px", boxSizing:"border-box", width:"100%"}}>{children}</div>
+      <main className="min-h-screen hidden lg:block" style={{marginLeft:"240px", width:"calc(100% - 240px)"}}>
+        <div style={{padding:"36px 48px 60px 40px"}}>{children}</div>
       </main>
       <main className="min-h-screen lg:hidden">
-        <div style={{padding:"72px 20px 48px 20px"}}>{children}</div>
+        <div style={{padding:"72px 24px 48px 24px"}}>{children}</div>
       </main>
     </div>
   )

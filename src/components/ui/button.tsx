@@ -8,17 +8,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  primary: 'bg-[#FF6357] hover:bg-[#e5554a] active:bg-[#d44840] text-white shadow-[0_1px_3px_rgba(255,99,87,0.4)] hover:shadow-[0_4px_12px_rgba(255,99,87,0.35)]',
-  secondary: 'bg-[#323232] hover:bg-[#3e3e3e] active:bg-[#2a2a2a] text-white shadow-[0_1px_3px_rgba(0,0,0,0.2)]',
-  ghost: 'bg-transparent hover:bg-black/6 active:bg-black/10 text-[#323232]',
-  danger: 'bg-red-500 hover:bg-red-600 active:bg-red-700 text-white shadow-[0_1px_3px_rgba(239,68,68,0.35)]',
-  outline: 'bg-white border border-black/12 hover:border-black/20 hover:bg-black/3 active:bg-black/6 text-[#323232] shadow-[0_1px_2px_rgba(0,0,0,0.06)]',
+  primary: 'bg-[#FF6357] hover:bg-[#e5554a] text-white shadow-sm hover:shadow-md',
+  secondary: 'bg-[#323232] hover:bg-[#3e3e3e] text-white shadow-sm',
+  ghost: 'bg-transparent hover:bg-black/6 text-[#323232]',
+  danger: 'bg-red-500 hover:bg-red-600 text-white shadow-sm',
+  outline: 'bg-white border border-black/12 hover:bg-black/3 text-[#323232] shadow-sm',
 }
 
 const sizes = {
-  sm: 'px-3.5 py-2 text-xs font-semibold gap-1.5',
+  sm: 'px-4 py-2 text-xs font-semibold gap-1.5',
   md: 'px-5 py-2.5 text-sm font-semibold gap-2',
-  lg: 'px-7 py-3.5 text-sm font-bold gap-2',
+  lg: 'px-6 py-3 text-sm font-bold gap-2',
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -28,9 +28,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={cn(
-          'inline-flex items-center justify-center rounded-2xl transition-all duration-150',
-          'disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none',
-          'active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6357]/40',
+          'inline-flex items-center justify-center rounded-2xl transition-all duration-150 whitespace-nowrap flex-shrink-0',
+          'disabled:opacity-40 disabled:cursor-not-allowed',
           variants[variant],
           sizes[size],
           className

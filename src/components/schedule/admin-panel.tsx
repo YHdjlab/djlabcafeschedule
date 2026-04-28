@@ -522,7 +522,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
               <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use Swap dropdowns to override.</p>
             </div>
             <button onClick={saveSchedule} disabled={saving}
-              className="flex-shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FF6357] text-white text-sm font-bold hover:bg-[#e5554a] transition-all disabled:opacity-50 shadow-sm">
+              className="flex-shrink-0 flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-[#FF6357] text-white text-sm font-bold hover:bg-[#e5554a] transition-all disabled:opacity-50 shadow-sm whitespace-nowrap">
               {saving ? 'Saving...' : 'Save and Submit'}
             </button>
           </div>
@@ -696,7 +696,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 if (!newStaff.some((m: any) => m.id === oldMember.id)) newStaff.push(oldMember)
                                 return { ...(fieldName === '__bench__' ? gs : { ...gs, [fieldName]: newId }), staff: newStaff }
                               }))
-                            }} className={cn("text-xs rounded-xl px-2 py-1 border-2 cursor-pointer font-bold bg-white flex-shrink-0", roleTextColor, "border-current/30")}>
+                            }} className={cn("text-xs rounded-xl px-3 py-1.5 border-2 cursor-pointer font-bold bg-white flex-shrink-0 whitespace-nowrap", roleTextColor, "border-current/40 hover:border-current/70 transition-colors")}>
                               <option value="">Swap</option>
                               {alts.map((sid: string) => <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>)}
                             </select>
