@@ -679,7 +679,8 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                               // Add old person to bench if not already there
                               const alreadyInStaff = newStaff.some((m: any) => m.id === oldMember.id)
                               if (!alreadyInStaff) newStaff.push(oldMember)
-                              return { ...updated, staff: newStaff }
+                              // Update the slot IDs too
+                              return { ...(fieldName === '__bench__' ? gs : { ...gs, [fieldName]: newId }), staff: newStaff }
                             }))
                           }}
                             className={cn("text-sm rounded-xl px-3 py-1.5 border-2 cursor-pointer font-bold bg-white flex-shrink-0", roleTextColor, "border-current/30 hover:border-current/60 transition-colors")}>
