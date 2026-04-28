@@ -12,15 +12,12 @@
   margin: 0;
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
+html, body {
   background-color: #F7F0E8;
   color: #323232;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
 
 :root {
