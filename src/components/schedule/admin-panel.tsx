@@ -516,13 +516,13 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
       {generatedSlots.length > 0 ? (
         <div className="space-y-8">
-          <div className="bg-white rounded-2xl border border-black/5 p-4 flex items-center justify-between gap-4">
+          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 flex items-center justify-between gap-4">
             <div>
               <h3 className="font-bold text-[#323232]">Schedule Preview</h3>
               <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use Swap dropdowns to override.</p>
             </div>
             <button onClick={saveSchedule} disabled={saving}
-              className="flex-shrink-0 flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-[#FF6357] text-white text-sm font-bold hover:bg-[#e5554a] transition-all disabled:opacity-50 shadow-sm whitespace-nowrap">
+              className="flex-shrink-0 flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-[#FF6357] text-white text-sm font-bold hover:bg-[#e5554a] active:scale-[0.98] transition-all disabled:opacity-50 shadow-md hover:shadow-lg whitespace-nowrap">
               {saving ? 'Saving...' : 'Save and Submit'}
             </button>
           </div>
@@ -535,24 +535,24 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
               return Array.from(staffSet)
             })()
             return (
-              <div key={slot.key} className={cn('bg-white rounded-2xl shadow-sm w-full', slot.issues?.length ? 'border-2 border-red-200' : 'border border-black/5')}>
+              <div key={slot.key} className={cn('bg-white rounded-3xl shadow-sm w-full overflow-hidden', slot.issues?.length ? 'ring-2 ring-red-300' : 'ring-1 ring-black/[0.06]')}>
                 {/* Day header */}
-                <div className={cn('px-6 py-5 flex items-center justify-between gap-4', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')}>
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <p className="font-black text-white text-xl">{slot.day}</p>
-                      <p className="text-xs text-white/50">{slot.date}</p>
+                <div className={cn('px-6 py-4 flex items-center justify-between gap-4', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="min-w-0">
+                      <p className="font-black text-white text-lg leading-tight">{slot.day}</p>
+                      <p className="text-xs text-white/40 mt-0.5">{slot.date}</p>
                     </div>
-                    {isWeekend && <span className="text-xs px-2.5 py-1 rounded-full bg-[#FF6357] text-white font-semibold">Full Rush</span>}
+                    {isWeekend && <span className="text-xs px-2.5 py-1 rounded-full bg-[#FF6357]/90 text-white font-semibold flex-shrink-0">Rush</span>}
                   </div>
-                  <div className="text-right">
-                    <p className="text-base font-black text-white whitespace-nowrap">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
-                    <p className="text-xs text-white/50">{slot.staff?.length || 0} staff · {slot.issues?.length ? slot.issues.length + ' issue' + (slot.issues.length > 1 ? 's' : '') : 'all good'}</p>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-base font-black text-white">{fmtH(slot.startH)} – {fmtH(slot.endH)}</p>
+                    <p className="text-xs text-white/40 mt-0.5">{slot.staff?.filter((m:any)=>m.role!=='Available').length || 0} assigned · {slot.issues?.length ? slot.issues.length + ' issue' + (slot.issues.length>1?'s':'') : 'all good'}</p>
                   </div>
                 </div>
                 {/* Rush band indicator for weekdays */}
                 {!isWeekend && (
-                  <div className="px-6 py-3 bg-[#F7F0E8] border-b border-black/5 flex items-center gap-4 flex-wrap">
+                  <div className="px-6 py-2.5 bg-[#F7F0E8]/80 border-b border-black/[0.06] flex items-center gap-4">
                     <div className="flex-1 h-2 rounded-full bg-gray-100 relative overflow-hidden">
                       <div className="absolute h-full bg-blue-200 rounded-full" style={{left: '0%', width: ((slot.rushStartH - 8) / 16 * 100) + '%'}}/>
                       <div className="absolute h-full bg-orange-300 rounded-full" style={{left: ((slot.rushStartH - 8) / 16 * 100) + '%', width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%'}}/>
@@ -572,8 +572,8 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                     const s = STAFF_MAP[member.id]
                     if (!s) return null
                     const info = member.info
-                    const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-purple-500' : member.role === 'Available' ? 'bg-gray-400' : 'bg-green-500'
-                    const roleBg = member.role === 'Supervisor' ? 'bg-blue-50 border-blue-100' : member.role === 'Bar' ? 'bg-purple-50 border-purple-100' : member.role === 'Available' ? 'bg-gray-50 border-dashed border-gray-300' : 'bg-green-50 border-green-100'
+                    const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-violet-500' : member.role === 'Available' ? 'bg-gray-300' : 'bg-emerald-500'
+                    const roleBg = member.role === 'Supervisor' ? 'bg-blue-50/80 border-blue-100/80' : member.role === 'Bar' ? 'bg-purple-50/80 border-purple-100/80' : member.role === 'Available' ? 'bg-gray-50 border-dashed border-gray-200' : 'bg-emerald-50/80 border-emerald-100/80'
                     const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : member.role === 'Available' ? 'text-gray-500' : 'text-green-600'
                     const memberActualRole = STAFF_MAP[member.id]?.role || ''
                     const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar','admin'] : member.role === 'Available' ? ['floor','bar','supervisor_floor','supervisor_bar','admin'] : ['floor','bar','supervisor_floor','supervisor_bar','admin']
@@ -608,7 +608,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                           <div className="flex-1 h-px bg-gray-200"/>
                         </div>
                       )}
-                      <div key={member.id} className={cn("rounded-2xl border px-4 py-3", roleBg, member.role === 'Available' && 'opacity-70')}>
+                      <div key={member.id} className={cn("rounded-2xl border px-4 py-3 transition-all", roleBg, member.role === 'Available' && 'opacity-60')}>
                         {/* Top row */}
                         <div className="flex items-center gap-2 mb-3 flex-nowrap">
                           <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
@@ -648,7 +648,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, role: assignRole === 'Floor1' || assignRole === 'Floor2' ? 'Floor' : assignRole } : m)
                                 return { ...gs, [fld]: member.id, staff: newStaff }
                               }))
-                            }} className="text-xs rounded-xl px-2 py-1 border-2 cursor-pointer font-bold bg-white text-[#FF6357] border-[#FF6357]/30 flex-shrink-0">
+                            }} className="text-xs rounded-xl px-3 py-1.5 border cursor-pointer font-semibold bg-white text-[#FF6357] border-[#FF6357]/30 flex-shrink-0 shadow-sm hover:shadow-md transition-all">
                               <option value="">+ Assign</option>
                               {!slot.supervisor_id && ['supervisor_floor','supervisor_bar','admin'].includes(STAFF_MAP[member.id]?.role) && <option value="Supervisor">As Supervisor</option>}
                               {!slot.bar_staff_id && <option value="Bar">As Bar</option>}
@@ -673,7 +673,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, role: 'Available' } : m)
                                 return { ...updated, staff: newStaff }
                               }))
-                            }} className="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-500 flex items-center justify-center flex-shrink-0 transition-colors text-gray-400 text-xs font-bold border border-gray-200">✕</button>
+                            }} className="w-6 h-6 rounded-full bg-black/5 hover:bg-red-50 hover:text-red-400 flex items-center justify-center flex-shrink-0 transition-all text-gray-300 text-xs font-bold">✕</button>
                           )}
                           {/* Swap button for assigned staff */}
                           {member.role !== 'Available' && alts.length > 0 && (
@@ -696,7 +696,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 if (!newStaff.some((m: any) => m.id === oldMember.id)) newStaff.push(oldMember)
                                 return { ...(fieldName === '__bench__' ? gs : { ...gs, [fieldName]: newId }), staff: newStaff }
                               }))
-                            }} className={cn("text-xs rounded-xl px-3 py-1.5 border-2 cursor-pointer font-bold bg-white flex-shrink-0 whitespace-nowrap", roleTextColor, "border-current/40 hover:border-current/70 transition-colors")}>
+                            }} className={cn("text-xs rounded-xl px-3 py-1.5 border cursor-pointer font-semibold bg-white flex-shrink-0 whitespace-nowrap shadow-sm", roleTextColor, "border-current/30 hover:shadow-md transition-all")}>
                               <option value="">Swap</option>
                               {alts.map((sid: string) => <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>)}
                             </select>
