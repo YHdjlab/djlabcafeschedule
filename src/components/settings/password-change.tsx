@@ -37,7 +37,7 @@ export function PasswordChange({ profile }: { profile: any }) {
     <div className="space-y-4">
       <Card>
         <CardHeader><CardTitle>Your Profile</CardTitle></CardHeader>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 p-1">
           <div className="w-14 h-14 rounded-full bg-[#323232] flex items-center justify-center">
             <span className="text-white text-xl font-bold">{profile.full_name?.charAt(0)}</span>
           </div>

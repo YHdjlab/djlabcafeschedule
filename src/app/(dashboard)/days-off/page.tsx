@@ -18,7 +18,7 @@ export default async function DaysOffPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#323232]">Days Off</h1>
+        <h1 className="text-2xl font-bold text-[#323232] tracking-tight">Days Off</h1>
         <p className="text-gray-500 text-sm mt-1">Request and track your days off</p>
       </div>
       <DayOffManager profile={profile} requests={requests || []}/>
