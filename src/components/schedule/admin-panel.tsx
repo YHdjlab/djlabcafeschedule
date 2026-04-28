@@ -566,12 +566,13 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                 )}
                 {/* Staff grid */}
                 <div className="px-6 py-4 space-y-3">
-                  {(slot.staff || []).map((member: any) => {
+                  {(slot.staff || []).map((member: any, memberIdx: number) => {
+                    const isFirstBench = member.role === 'Available' && memberIdx > 0 && slot.staff[memberIdx-1]?.role !== 'Available'
                     const s = STAFF_MAP[member.id]
                     if (!s) return null
                     const info = member.info
                     const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-purple-500' : member.role === 'Available' ? 'bg-gray-400' : 'bg-green-500'
-                    const roleBg = member.role === 'Supervisor' ? 'bg-blue-50 border-blue-100' : member.role === 'Bar' ? 'bg-purple-50 border-purple-100' : member.role === 'Available' ? 'bg-gray-50 border-gray-200' : 'bg-green-50 border-green-100'
+                    const roleBg = member.role === 'Supervisor' ? 'bg-blue-50 border-blue-100' : member.role === 'Bar' ? 'bg-purple-50 border-purple-100' : member.role === 'Available' ? 'bg-gray-50 border-dashed border-gray-300' : 'bg-green-50 border-green-100'
                     const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : member.role === 'Available' ? 'text-gray-500' : 'text-green-600'
                     const memberActualRole = STAFF_MAP[member.id]?.role || ''
                     const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar','admin'] : member.role === 'Available' ? ['floor','bar','supervisor_floor','supervisor_bar','admin'] : ['floor','bar','supervisor_floor','supervisor_bar','admin']
@@ -598,7 +599,15 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                       return overlap.length >= Math.ceil(info.totalH * 0.5)
                     })
                     return (
-                      <div key={member.id} className={cn("rounded-2xl border px-5 py-4", roleBg)}>
+                      <>
+                      {isFirstBench && (
+                        <div className="flex items-center gap-3 py-1">
+                          <div className="flex-1 h-px bg-gray-200"/>
+                          <span className="text-xs text-gray-400 font-medium whitespace-nowrap">Also available · not assigned</span>
+                          <div className="flex-1 h-px bg-gray-200"/>
+                        </div>
+                      )}
+                      <div key={member.id} className={cn("rounded-2xl border px-5 py-4", roleBg, member.role === 'Available' && 'opacity-60')}>
                         {/* Top row: avatar + name + role + hours + swap */}
                         <div className="flex items-center gap-3 mb-3">
                           <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
@@ -691,6 +700,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                             )}
                         </div>
                       </div>
+                      </>
                     )
                   })}
                 </div>
