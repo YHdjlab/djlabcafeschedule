@@ -573,7 +573,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                     const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : member.role === 'Available' ? 'text-gray-500' : 'text-green-600'
                     const memberActualRole = STAFF_MAP[member.id]?.role || ''
                     const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar','admin'] : member.role === 'Bar' ? ['bar','supervisor_bar'] : member.role === 'Available' ? ['floor','bar','supervisor_floor','supervisor_bar','admin'] : ['floor','supervisor_floor','admin']
-                    const fieldName = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.role === 'Available' ? null : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
+                    const fieldName: string = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.role === 'Available' ? '__bench__' : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
                     const alts = member.role === 'Available' ? [] : slotAvail.filter((sid: string) => {
                       if (sid === member.id) return false
                       if (!eligibleRoles.includes(STAFF_MAP[sid]?.role)) return false
@@ -656,7 +656,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                             const newId = e.target.value
                             setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
                               if (gs.key !== slot.key) return gs
-                              const updated = { ...gs, [fieldName]: newId }
+                              const updated = fieldName === '__bench__' ? gs : { ...gs, [fieldName]: newId }
                               const newHours = weekAvailability
                                 .filter((a: any) => a.staff_id === newId && a.slot_date === gs.date)
                                 .map((a: any) => { const match = a.slot_key.match(/_h(\d+)$/); return match ? parseInt(match[1]) : -1 })
