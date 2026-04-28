@@ -85,9 +85,6 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
           </button>
         ))}
       </div>
-
-        </div>
-      </div>
       <div style={{ padding: '24px 32px' }}>
       {tab === 'overview' && <OverviewTab staff={staff} pendingDaysOff={pendingDaysOff} pendingSwaps={pendingSwaps} pendingAttendance={pendingAttendance} schedules={schedules} availability={availability}/>}
       {tab === 'staff' && <StaffTab staff={staff} setStaff={setStaff} profile={profile} supabase={supabase}/>}
