@@ -1,4 +1,30 @@
-'use client'
+const fs = require("fs");
+
+// Design tokens
+const D = {
+  bg: '#1C1C1E',
+  bgCard: '#2C2C2E',
+  bgHover: '#3A3A3C',
+  bgInput: '#3A3A3C',
+  coral: '#FF6357',
+  coralDim: 'rgba(255,99,87,0.15)',
+  cream: '#F7F0E8',
+  creamDim: 'rgba(247,240,232,0.08)',
+  creamMid: 'rgba(247,240,232,0.5)',
+  white: '#FFFFFF',
+  border: 'rgba(255,255,255,0.08)',
+  borderMid: 'rgba(255,255,255,0.12)',
+  blue: '#3B82F6',
+  purple: '#A855F7',
+  green: '#22C55E',
+  gray: '#636366',
+  grayLight: '#8E8E93',
+  radius: '14px',
+  radiusSm: '10px',
+  radiusLg: '20px',
+};
+
+const content = `'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { Button } from '@/components/ui/button'
@@ -16,15 +42,15 @@ const CREAM = '#F7F0E8'
 const MUTED = 'rgba(247,240,232,0.45)'
 
 const S = {
-  card: { backgroundColor: CARD, borderRadius: '16px', border: `1px solid ${BORDER}`, padding: '20px' } as React.CSSProperties,
-  cardSm: { backgroundColor: CARD, borderRadius: '16px', border: `1px solid ${BORDER}`, padding: '12px 16px' } as React.CSSProperties,
+  card: { backgroundColor: CARD, borderRadius: '16px', border: \`1px solid \${BORDER}\`, padding: '20px' } as React.CSSProperties,
+  cardSm: { backgroundColor: CARD, borderRadius: '16px', border: \`1px solid \${BORDER}\`, padding: '12px 16px' } as React.CSSProperties,
   row: { backgroundColor: CARD2, borderRadius: '12px', padding: '12px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' } as React.CSSProperties,
   label: { color: MUTED, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.06em' },
   title: { color: CREAM, fontSize: '15px', fontWeight: 700 },
   body: { color: MUTED, fontSize: '13px' },
   btn: { display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', backgroundColor: CORAL, color: 'white', fontSize: '13px', fontWeight: 700, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' as const, flexShrink: 0, boxShadow: '0 2px 12px rgba(255,99,87,0.4)' } as React.CSSProperties,
   btnSm: { display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px', backgroundColor: CORAL, color: 'white', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' as const } as React.CSSProperties,
-  btnGhost: { display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.06)', color: CREAM, fontSize: '13px', fontWeight: 600, border: `1px solid ${BORDER}`, cursor: 'pointer', whiteSpace: 'nowrap' as const } as React.CSSProperties,
+  btnGhost: { display: 'flex', alignItems: 'center', gap: '6px', padding: '9px 18px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.06)', color: CREAM, fontSize: '13px', fontWeight: 600, border: \`1px solid \${BORDER}\`, cursor: 'pointer', whiteSpace: 'nowrap' as const } as React.CSSProperties,
   btnDanger: { display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px', backgroundColor: '#ef4444', color: 'white', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' as const } as React.CSSProperties,
   btnSuccess: { display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px', backgroundColor: '#22c55e', color: 'white', fontSize: '12px', fontWeight: 600, border: 'none', cursor: 'pointer', whiteSpace: 'nowrap' as const } as React.CSSProperties,
 }
@@ -187,7 +213,7 @@ function StaffTab({ staff, setStaff, profile, supabase }: any) {
               </span>
               {!s.active && <span style={{ backgroundColor: '#ef444420', color: '#ef4444', fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: '20px' }}>Terminated</span>}
               {isGM && s.id !== profile.id && (
-                <button onClick={() => setEditId(editId === s.id ? null : s.id)} style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: MUTED, fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: '8px', border: `1px solid ${BORDER}`, cursor: 'pointer' }}>
+                <button onClick={() => setEditId(editId === s.id ? null : s.id)} style={{ backgroundColor: 'rgba(255,255,255,0.06)', color: MUTED, fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: '8px', border: \`1px solid \${BORDER}\`, cursor: 'pointer' }}>
                   {editId === s.id ? 'Cancel' : 'Edit'}
                 </button>
               )}
@@ -199,9 +225,9 @@ function StaffTab({ staff, setStaff, profile, supabase }: any) {
             </div>
           </div>
           {isGM && s.id !== profile.id && editId === s.id && (
-            <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${BORDER}` }}>
+            <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: \`1px solid \${BORDER}\` }}>
               <select value={s.role} onChange={e => { updateRole(s.id, e.target.value); setEditId(null) }}
-                style={{ backgroundColor: CARD2, color: CREAM, border: `1px solid ${BORDER}`, borderRadius: '8px', padding: '8px 12px', fontSize: '13px', width: '100%', cursor: 'pointer' }}>
+                style={{ backgroundColor: CARD2, color: CREAM, border: \`1px solid \${BORDER}\`, borderRadius: '8px', padding: '8px 12px', fontSize: '13px', width: '100%', cursor: 'pointer' }}>
                 {ROLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
               </select>
             </div>
@@ -231,7 +257,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
   const getStaffHours = (staffId: string, dateStr: string) => {
     const hours = weekAvailability.filter((a: any) => a.staff_id === staffId && a.slot_date === dateStr)
-      .map((a: any) => { const m = a.slot_key.match(/_h(\d+)$/); return m ? parseInt(m[1]) : -1 })
+      .map((a: any) => { const m = a.slot_key.match(/_h(\\d+)$/); return m ? parseInt(m[1]) : -1 })
       .filter((h: number) => h >= 0).sort((a: number, b: number) => a - b)
     if (!hours.length) return null
     return { startH: hours[0], endH: hours[hours.length-1]+1, totalH: hours[hours.length-1]+1-hours[0], hours }
@@ -346,7 +372,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       {/* Week nav */}
       <div style={{ ...S.card, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '12px 16px' }}>
         <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()-7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }}
-          style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.06)', border: `1px solid ${BORDER}`, color: CREAM, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.06)', border: \`1px solid \${BORDER}\`, color: CREAM, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <ChevronLeft size={16}/>
         </button>
         <div style={{ textAlign: 'center' }}>
@@ -354,7 +380,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
           <p style={{ color: MUTED, fontSize: '12px', marginTop: '2px' }}>{weekSchedules.length} slots · {weekAvailability.length} availability entries</p>
         </div>
         <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()+7); setWeekStart(format(d,'yyyy-MM-dd')); setGeneratedSlots([]) }}
-          style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.06)', border: `1px solid ${BORDER}`, color: CREAM, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          style={{ width: '36px', height: '36px', borderRadius: '10px', backgroundColor: 'rgba(255,255,255,0.06)', border: \`1px solid \${BORDER}\`, color: CREAM, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
           <ChevronRight size={16}/>
         </button>
       </div>
@@ -410,7 +436,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
           {generatedSlots.map((slot: any) => {
             const fmtH = slot.fmtH
             return (
-              <div key={slot.key} style={{ borderRadius: '16px', border: slot.issues?.length ? '1px solid rgba(239,68,68,0.3)' : `1px solid ${BORDER}`, overflow: 'hidden' }}>
+              <div key={slot.key} style={{ borderRadius: '16px', border: slot.issues?.length ? '1px solid rgba(239,68,68,0.3)' : \`1px solid \${BORDER}\`, overflow: 'hidden' }}>
                 {/* Day header */}
                 <div style={{ padding: '14px 18px', backgroundColor: slot.issues?.length ? '#3B0A0A' : '#2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
@@ -430,7 +456,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
                 {/* Rush indicator */}
                 {!slot.isWeekend && (
-                  <div style={{ padding: '8px 18px', backgroundColor: '#1e1e1e', borderBottom: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ padding: '8px 18px', backgroundColor: '#1e1e1e', borderBottom: \`1px solid \${BORDER}\`, display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{ flex: 1, height: '6px', borderRadius: '20px', backgroundColor: 'rgba(255,255,255,0.06)', position: 'relative', overflow: 'hidden' }}>
                       <div style={{ position: 'absolute', height: '100%', backgroundColor: 'rgba(59,130,246,0.4)', left: '0%', width: ((slot.rushStartH-8)/16*100)+'%' }}/>
                       <div style={{ position: 'absolute', height: '100%', backgroundColor: 'rgba(249,115,22,0.6)', left: ((slot.rushStartH-8)/16*100)+'%', width: ((slot.rushEndH-slot.rushStartH)/16*100)+'%' }}/>
@@ -467,7 +493,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                             <div style={{ flex: 1, height: '1px', backgroundColor: BORDER }}/>
                           </div>
                         )}
-                        <div style={{ backgroundColor: member.role === 'Available' ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)', borderRadius: '12px', border: member.role === 'Available' ? `1px dashed ${BORDER}` : `1px solid ${BORDER}`, padding: '10px 12px', opacity: member.role === 'Available' ? 0.65 : 1 }}>
+                        <div style={{ backgroundColor: member.role === 'Available' ? 'rgba(255,255,255,0.02)' : 'rgba(255,255,255,0.04)', borderRadius: '12px', border: member.role === 'Available' ? \`1px dashed \${BORDER}\` : \`1px solid \${BORDER}\`, padding: '10px 12px', opacity: member.role === 'Available' ? 0.65 : 1 }}>
                           {/* Top row */}
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: info ? '10px' : '0', flexWrap: 'wrap' }}>
                             <div style={{ width: '30px', height: '30px', borderRadius: '50%', backgroundColor: rc, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -496,7 +522,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 const fm: Record<string,string> = { Supervisor: 'supervisor_id', Bar: 'bar_staff_id', Floor1: 'floor_staff1_id', Floor2: 'floor_staff2_id' }
                                 const fld = fm[ar]; if (!fld) return
                                 setGeneratedSlots(prev => prev.map(gs => gs.key !== slot.key ? gs : { ...gs, [fld]: member.id, staff: gs.staff.map((m: any) => m.id === member.id ? { ...m, role: ar === 'Floor1' || ar === 'Floor2' ? 'Floor' : ar } : m) }))
-                              }} style={{ backgroundColor: CORAL + '20', color: CORAL, border: `1px solid ${CORAL}40`, borderRadius: '8px', padding: '4px 8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                              }} style={{ backgroundColor: CORAL + '20', color: CORAL, border: \`1px solid \${CORAL}40\`, borderRadius: '8px', padding: '4px 8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
                                 <option value="">+ Assign</option>
                                 {!slot.supervisor_id && ['supervisor_floor','supervisor_bar','admin'].includes(STAFF_MAP[member.id]?.role) && <option value="Supervisor">As Supervisor</option>}
                                 {!slot.bar_staff_id && <option value="Bar">As Bar</option>}
@@ -519,14 +545,14 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 const newId = e.target.value
                                 setGeneratedSlots(prev => prev.map(gs => {
                                   if (gs.key !== slot.key) return gs
-                                  const newHours = weekAvailability.filter((a: any) => a.staff_id === newId && a.slot_date === gs.date).map((a: any) => { const match = a.slot_key.match(/_h(\d+)$/); return match ? parseInt(match[1]) : -1 }).filter((h: number) => h >= 0).sort((a: number, b: number) => a - b)
+                                  const newHours = weekAvailability.filter((a: any) => a.staff_id === newId && a.slot_date === gs.date).map((a: any) => { const match = a.slot_key.match(/_h(\\d+)$/); return match ? parseInt(match[1]) : -1 }).filter((h: number) => h >= 0).sort((a: number, b: number) => a - b)
                                   const newInfo = newHours.length ? { startH: newHours[0], endH: newHours[newHours.length-1]+1, totalH: newHours[newHours.length-1]+1-newHours[0], hours: newHours } : null
                                   const oldMember = { id: member.id, role: 'Available', info: member.info }
                                   const newStaff = gs.staff.map((m: any) => { if (m.id === member.id) return { ...m, id: newId, info: newInfo }; if (m.id === newId) return null; return m }).filter(Boolean)
                                   if (!newStaff.some((m: any) => m.id === oldMember.id)) newStaff.push(oldMember)
                                   return { ...(fieldName === '__bench__' ? gs : { ...gs, [fieldName]: newId }), staff: newStaff }
                                 }))
-                              }} style={{ backgroundColor: rc + '15', color: rc, border: `1px solid ${rc}30`, borderRadius: '8px', padding: '4px 8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
+                              }} style={{ backgroundColor: rc + '15', color: rc, border: \`1px solid \${rc}30\`, borderRadius: '8px', padding: '4px 8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
                                 <option value="">Swap</option>
                                 {alts.map((sid: string) => <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>)}
                               </select>
@@ -702,7 +728,7 @@ function SettingsTab({ rushConfig, setRushConfig, profile, supabase }: any) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
       <label style={{ color: MUTED, fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{label}</label>
       <input type="time" value={value} onChange={e => onChange(e.target.value)} disabled={disabled}
-        style={{ backgroundColor: CARD2, color: CREAM, border: `1px solid ${BORDER}`, borderRadius: '10px', padding: '10px 12px', fontSize: '14px', width: '100%', cursor: disabled ? 'not-allowed' : 'text', opacity: disabled ? 0.5 : 1 }}/>
+        style={{ backgroundColor: CARD2, color: CREAM, border: \`1px solid \${BORDER}\`, borderRadius: '10px', padding: '10px 12px', fontSize: '14px', width: '100%', cursor: disabled ? 'not-allowed' : 'text', opacity: disabled ? 0.5 : 1 }}/>
     </div>
   )
 
@@ -752,3 +778,7 @@ function SettingsTab({ rushConfig, setRushConfig, profile, supabase }: any) {
     </div>
   )
 }
+`;
+
+fs.writeFileSync("src/components/schedule/admin-panel.tsx", content, "utf8");
+console.log("admin-panel.tsx completely rewritten - dark premium design");
