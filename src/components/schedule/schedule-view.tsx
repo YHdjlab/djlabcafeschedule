@@ -107,7 +107,7 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
           const endH = slot ? timeToH(slot.end_time) : 24
 
           return (
-            <div key={dateStr} className="bg-white rounded-3xl overflow-hidden shadow-sm"
+            <div key={dateStr} className="bg-white rounded-3xl shadow-sm border border-black/5"
               style={{outline: isToday ? '2px solid #FF6357' : '1px solid rgba(0,0,0,0.06)'}}>
 
               {/* Day header */}

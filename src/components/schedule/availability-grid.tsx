@@ -201,7 +201,7 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
           )
 
           return (
-            <div key={day} className={cn('bg-white rounded-3xl border overflow-hidden shadow-sm',
+            <div key={day} className={cn('bg-white rounded-3xl border shadow-sm',
               isWeekend ? 'border-orange-200' : 'border-black/[0.06]'
             )}>
               {/* Day header */}

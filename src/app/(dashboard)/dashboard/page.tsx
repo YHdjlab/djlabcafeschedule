@@ -108,7 +108,7 @@ export default async function DashboardPage() {
       )}
 
       {todaySchedule && todaySchedule.length > 0 && (
-        <div className="bg-white rounded-2xl border border-black/5 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/5">
           <div className="px-5 py-4 border-b border-black/5 flex items-center justify-between">
             <h2 className="font-semibold text-[#323232]">Today on the floor</h2>
             <Link href="/schedule" className="flex items-center gap-1 text-xs text-[#FF6357] font-medium hover:underline">Full schedule<ChevronRight size={12}/></Link>
@@ -136,7 +136,7 @@ export default async function DashboardPage() {
       )}
 
       {isAdmin && totalPending > 0 && (
-        <div className="bg-white rounded-2xl border border-black/5 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-black/5">
           <div className="px-5 py-4 border-b border-black/5 flex items-center justify-between">
             <h2 className="font-semibold text-[#323232]">Needs your attention</h2>
             <Link href="/admin" className="flex items-center gap-1 text-xs text-[#FF6357] font-medium hover:underline">Manage all<ChevronRight size={12}/></Link>
