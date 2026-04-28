@@ -516,7 +516,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
       {generatedSlots.length > 0 ? (
         <div className="space-y-8">
-          <div className="bg-white rounded-2xl border border-black/5 p-5 flex items-center justify-between gap-6">
+          <div className="bg-white rounded-2xl border border-black/5 p-4 flex items-center justify-between gap-4">
             <div>
               <h3 className="font-bold text-[#323232]">Schedule Preview</h3>
               <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use Swap dropdowns to override.</p>
@@ -537,22 +537,22 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
             return (
               <div key={slot.key} className={cn('bg-white rounded-2xl overflow-hidden shadow-sm', slot.issues?.length ? 'ring-2 ring-red-200' : 'ring-1 ring-black/5')}>
                 {/* Day header */}
-                <div className={cn('px-8 py-6 flex items-center justify-between', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')}>
+                <div className={cn('px-6 py-5 flex items-center justify-between gap-4', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')}>
                   <div className="flex items-center gap-3">
                     <div>
-                      <p className="font-black text-white text-2xl">{slot.day}</p>
+                      <p className="font-black text-white text-xl">{slot.day}</p>
                       <p className="text-xs text-white/50">{slot.date}</p>
                     </div>
                     {isWeekend && <span className="text-xs px-2.5 py-1 rounded-full bg-[#FF6357] text-white font-semibold">Full Rush</span>}
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-black text-white">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
+                    <p className="text-base font-black text-white whitespace-nowrap">{fmtH(slot.startH)} - {fmtH(slot.endH)}</p>
                     <p className="text-xs text-white/50">{slot.staff?.length || 0} staff · {slot.issues?.length ? slot.issues.length + ' issue' + (slot.issues.length > 1 ? 's' : '') : 'all good'}</p>
                   </div>
                 </div>
                 {/* Rush band indicator for weekdays */}
                 {!isWeekend && (
-                  <div className="px-8 py-4 bg-[#F7F0E8] border-b border-black/5 flex items-center gap-6">
+                  <div className="px-6 py-3 bg-[#F7F0E8] border-b border-black/5 flex items-center gap-4 flex-wrap">
                     <div className="flex-1 h-2 rounded-full bg-gray-100 relative overflow-hidden">
                       <div className="absolute h-full bg-blue-200 rounded-full" style={{left: '0%', width: ((slot.rushStartH - 8) / 16 * 100) + '%'}}/>
                       <div className="absolute h-full bg-orange-300 rounded-full" style={{left: ((slot.rushStartH - 8) / 16 * 100) + '%', width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%'}}/>
@@ -568,6 +568,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                 <div className="px-6 py-4 space-y-3">
                   {(slot.staff || []).map((member: any, memberIdx: number) => {
                     const isFirstBench = member.role === 'Available' && memberIdx > 0 && slot.staff[memberIdx-1]?.role !== 'Available'
+                    const canAddToShift = member.role === 'Available'
                     const s = STAFF_MAP[member.id]
                     if (!s) return null
                     const info = member.info
@@ -603,11 +604,11 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                       {isFirstBench && (
                         <div className="flex items-center gap-3 py-1">
                           <div className="flex-1 h-px bg-gray-200"/>
-                          <span className="text-xs text-gray-400 font-medium whitespace-nowrap">Also available · not assigned</span>
+                          <span className="text-xs text-gray-400 font-medium whitespace-nowrap">Also available</span>
                           <div className="flex-1 h-px bg-gray-200"/>
                         </div>
                       )}
-                      <div key={member.id} className={cn("rounded-2xl border px-5 py-4", roleBg, member.role === 'Available' && 'opacity-60')}>
+                      <div key={member.id} className={cn("rounded-2xl border px-5 py-4", roleBg, member.role === 'Available' && 'opacity-70')}>
                         {/* Top row: avatar + name + role + hours + swap */}
                         <div className="flex items-center gap-3 mb-3">
                           <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
@@ -617,7 +618,38 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                             <p className="text-sm font-bold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
                             <span className={cn("text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full", roleBg, roleTextColor, "border")}>{member.role}</span>
                             {info && <span className="text-xs font-bold text-[#FF6357]">{info.totalH}h</span>}
-                          {alts.length > 0 && (
+                          {member.role === 'Available' ? (
+                            /* Assign bench staff to a role */
+                            <select value="" onChange={e => {
+                              if (!e.target.value) return
+                              const assignRole = e.target.value
+                              const staffRole = STAFF_MAP[member.id]?.role || ''
+                              const roleFieldMap: Record<string,string> = {
+                                'Supervisor': 'supervisor_id',
+                                'Bar': 'bar_staff_id',
+                                'Floor1': 'floor_staff1_id',
+                                'Floor2': 'floor_staff2_id',
+                              }
+                              const fld = roleFieldMap[assignRole]
+                              if (!fld) return
+                              setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
+                                if (gs.key !== slot.key) return gs
+                                const newStaff = gs.staff
+                                  .map((m: any) => m.id === member.id ? { ...m, role: assignRole === 'Floor1' || assignRole === 'Floor2' ? 'Floor' : assignRole } : m)
+                                  .filter(Boolean)
+                                return { ...gs, [fld]: member.id, staff: newStaff }
+                              }))
+                            }}
+                              className="text-xs rounded-xl px-2 py-1 border-2 cursor-pointer font-bold bg-white text-[#FF6357] border-[#FF6357]/30 flex-shrink-0">
+                              <option value="">+ Assign</option>
+                              {!slot.supervisor_id && ['supervisor_floor','supervisor_bar','admin'].includes(STAFF_MAP[member.id]?.role) && <option value="Supervisor">As Supervisor</option>}
+                              {!slot.bar_staff_id && ['bar','supervisor_bar','floor','supervisor_floor'].includes(STAFF_MAP[member.id]?.role) && <option value="Bar">As Bar</option>}
+                              {!slot.floor_staff1_id && ['floor','supervisor_floor','bar','supervisor_bar'].includes(STAFF_MAP[member.id]?.role) && <option value="Floor1">As Floor</option>}
+                              {slot.floor_staff1_id && !slot.floor_staff2_id && ['floor','supervisor_floor','bar','supervisor_bar'].includes(STAFF_MAP[member.id]?.role) && <option value="Floor2">As 2nd Floor</option>}
+                              {/* Always allow adding as extra supervisor for overlap shifts */}
+                              {slot.supervisor_id && ['supervisor_floor','supervisor_bar','admin'].includes(STAFF_MAP[member.id]?.role) && <option value="Floor1">Cover Overlap</option>}
+                            </select>
+                          ) : alts.length > 0 && (
                             <select value="" onChange={e => {
                               if (!e.target.value) return
                               const newId = e.target.value
