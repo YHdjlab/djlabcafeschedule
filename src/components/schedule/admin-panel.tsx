@@ -416,12 +416,12 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
           {generatedSlots.map((slot: any) => {
             const fmtH = slot.fmtH
             return (
-              <div key={slot.key} style={{ borderRadius: '16px', border: slot.issues?.length ? '1px solid rgba(239,68,68,0.3)' : `1px solid ${BORDER}`, overflow: 'hidden' }}>
+              <div key={slot.key} style={{ borderRadius: '16px', border: slot.issues?.length ? '1px solid rgba(239,68,68,0.4)' : '1px solid rgba(255,255,255,0.12)', overflow: 'hidden', boxShadow: slot.issues?.length ? '0 4px 24px rgba(239,68,68,0.1)' : '0 4px 24px rgba(0,0,0,0.3)' }}>
                 {/* Day header */}
-                <div style={{ padding: '14px 18px', backgroundColor: slot.issues?.length ? '#3B0A0A' : '#2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ padding: '16px 20px', background: slot.issues?.length ? 'linear-gradient(135deg, #3B0A0A, #2a0a0a)' : slot.isWeekend ? 'linear-gradient(135deg, #2a1a0a, #1e1e1e)' : 'linear-gradient(135deg, #2a2a2a, #1e1e1e)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
                     <div>
-                      <p style={{ color: CREAM, fontSize: '17px', fontWeight: 800, lineHeight: 1 }}>{slot.day}</p>
+                      <p style={{ color: CREAM, fontSize: '20px', fontWeight: 900, lineHeight: 1, letterSpacing: '-0.02em' }}>{slot.day}</p>
                       <p style={{ color: MUTED, fontSize: '11px', marginTop: '2px' }}>{slot.date}</p>
                     </div>
                     {slot.isWeekend && <span style={{ backgroundColor: CORAL, color: 'white', fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', flexShrink: 0 }}>Full Rush</span>}
