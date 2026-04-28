@@ -1,4 +1,26 @@
-'use client'
+const fs = require("fs");
+
+// Clear old data first via service role
+const clearScript = `
+const { createClient } = require("@supabase/supabase-js");
+const supabase = createClient(
+  "https://gxmdtemgiuvahlcaobrr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4bWR0ZW1naXV2YWhsY2FvYnJyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjkzMjYyMCwiZXhwIjoyMDkyNTA4NjIwfQ.S3Q-YJf_dlJqSPKebfNWFpwUo-2_x-Ci5llCK6_ueps",
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
+async function go() {
+  for (const t of ["attendance","swap_requests","day_off_requests","schedules","availability","fillin_requests"]) {
+    const { error } = await supabase.from(t).delete().neq("id","00000000-0000-0000-0000-000000000000");
+    console.log(t+":", error ? "ERROR: "+error.message : "cleared");
+  }
+}
+go();
+`;
+fs.writeFileSync("clear_for_shifts.js", clearScript, "utf8");
+console.log("clear_for_shifts.js written");
+
+// New availability-grid component
+const newGrid = `'use client'
 import { useState, useMemo } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { cn } from '@/lib/utils'
@@ -271,3 +293,18 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
     </div>
   )
 }
+`;
+
+fs.writeFileSync("src/components/schedule/availability-grid.tsx", newGrid, "utf8");
+console.log("availability-grid.tsx written");
+
+// Update availability page subtitle
+let page = fs.readFileSync("src/app/(dashboard)/availability/page.tsx", "utf8");
+page = page.replace(
+  'Select hours you are available. Submit when done.',
+  'Pick your shifts for the week. Max 2 of each type (AM/MID/PM). Fri/Sat/Sun are mandatory.'
+);
+fs.writeFileSync("src/app/(dashboard)/availability/page.tsx", page, "utf8");
+console.log("availability/page.tsx updated");
+
+console.log("\nAll done! Now run: node clear_for_shifts.js && npm run build");
