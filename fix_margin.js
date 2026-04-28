@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase-server"
+﻿const fs = require("fs");
+fs.writeFileSync("src/app/(dashboard)/layout.tsx", `import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/layout/sidebar"
 
@@ -20,3 +21,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
     </div>
   )
 }
+`);
+console.log("done");
