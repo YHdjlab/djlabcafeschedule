@@ -701,7 +701,6 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                               {alts.map((sid: string) => <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>)}
                             </select>
                           )}
-                          </div>{/* end action buttons */}
                         </div>
                         {/* Timeline */}
                         <div className="w-full">
