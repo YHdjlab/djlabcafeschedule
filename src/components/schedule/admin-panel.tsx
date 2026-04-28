@@ -571,9 +571,10 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                     const roleColor = member.role === 'Supervisor' ? 'bg-blue-500' : member.role === 'Bar' ? 'bg-purple-500' : member.role === 'Available' ? 'bg-gray-400' : 'bg-green-500'
                     const roleBg = member.role === 'Supervisor' ? 'bg-blue-50 border-blue-100' : member.role === 'Bar' ? 'bg-purple-50 border-purple-100' : member.role === 'Available' ? 'bg-gray-50 border-gray-200' : 'bg-green-50 border-green-100'
                     const roleTextColor = member.role === 'Supervisor' ? 'text-blue-600' : member.role === 'Bar' ? 'text-purple-600' : member.role === 'Available' ? 'text-gray-500' : 'text-green-600'
-                    const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar'] : member.role === 'Bar' ? ['bar','supervisor_bar'] : ['floor','supervisor_floor']
-                    const fieldName = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
-                    const alts = slotAvail.filter((sid: string) => {
+                    const memberActualRole = STAFF_MAP[member.id]?.role || ''
+                    const eligibleRoles = member.role === 'Supervisor' ? ['supervisor_floor','supervisor_bar','admin'] : member.role === 'Bar' ? ['bar','supervisor_bar'] : member.role === 'Available' ? ['floor','bar','supervisor_floor','supervisor_bar','admin'] : ['floor','supervisor_floor','admin']
+                    const fieldName = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.role === 'Available' ? null : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
+                    const alts = member.role === 'Available' ? [] : slotAvail.filter((sid: string) => {
                       if (sid === member.id) return false
                       if (!eligibleRoles.includes(STAFF_MAP[sid]?.role)) return false
                       if (sid === slot.supervisor_id) return false
