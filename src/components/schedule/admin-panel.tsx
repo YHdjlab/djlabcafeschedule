@@ -62,9 +62,13 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
   const totalApprovals = pendingDaysOff.length + pendingSwaps.length + pendingAttendance.length
 
   return (
-    <div style={{ backgroundColor: BG, borderRadius: '0', padding: '0', minHeight: '600px' }}>
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '24px' }}>
+    <div style={{ backgroundColor: BG, minHeight: '100vh', margin: '-24px -32px', padding: '0' }}>
+      {/* Header */}
+      <div style={{ padding: '24px 32px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', marginBottom: '0' }}>
+        <h1 style={{ color: CREAM, fontSize: '22px', fontWeight: 800, marginBottom: '4px' }}>Admin Panel</h1>
+        <p style={{ color: MUTED, fontSize: '13px', marginBottom: '16px' }}>Manage staff, schedules, and system settings</p>
+        {/* Tabs */}
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', paddingBottom: '0' }}>
         {TABS.map((t: any) => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{
             display: 'flex', alignItems: 'center', gap: '6px',
@@ -82,11 +86,15 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
         ))}
       </div>
 
+        </div>
+      </div>
+      <div style={{ padding: '24px 32px' }}>
       {tab === 'overview' && <OverviewTab staff={staff} pendingDaysOff={pendingDaysOff} pendingSwaps={pendingSwaps} pendingAttendance={pendingAttendance} schedules={schedules} availability={availability}/>}
       {tab === 'staff' && <StaffTab staff={staff} setStaff={setStaff} profile={profile} supabase={supabase}/>}
       {tab === 'schedule' && <ScheduleBuilderTab staff={staff} schedules={schedules} setSchedules={setSchedules} profile={profile} supabase={supabase} availability={availability} rushConfig={rushConfig}/>}
       {tab === 'approvals' && <ApprovalsTab pendingDaysOff={pendingDaysOff} setPendingDaysOff={setPendingDaysOff} pendingSwaps={pendingSwaps} setPendingSwaps={setPendingSwaps} pendingAttendance={pendingAttendance} setPendingAttendance={setPendingAttendance} profile={profile} supabase={supabase}/>}
       {tab === 'settings' && <SettingsTab rushConfig={rushConfig} setRushConfig={setRushConfig} profile={profile} supabase={supabase}/>}
+      </div>
     </div>
   )
 }
