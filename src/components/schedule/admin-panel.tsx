@@ -155,7 +155,7 @@ function StaffTab({ staff, setStaff, profile, supabase }: any) {
   const [form, setForm] = useState({ full_name: '', email: '', role: 'floor', phone: '', notes: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const isGM = profile.role === 'gm' || profile.is_admin === true
+  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role) || profile.is_admin === true
 
   const toggleActive = async (id: string, current: boolean) => {
     const { data } = await supabase.from('profiles').update({
@@ -236,7 +236,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
   const [saving, setSaving] = useState(false)
   const [generatedSlots, setGeneratedSlots] = useState<any[]>([])
   const [editSlot, setEditSlot] = useState<string|null>(null)
-  const isGM = profile.role === 'gm' || profile.is_admin === true
+  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role) || profile.is_admin === true
 
   const activeStaff = staff.filter((s: any) => s.active && s.role !== 'gm')
   const STAFF_MAP = Object.fromEntries(activeStaff.map((s: any) => [s.id, s]))
@@ -437,7 +437,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     const { data } = await supabase.from('schedules').insert(rows).select('*, supervisor:supervisor_id(id,full_name), bar_staff:bar_staff_id(id,full_name), floor_staff1:floor_staff1_id(id,full_name), floor_staff2:floor_staff2_id(id,full_name)')
     if (data) {
       // If GM or admin - auto approve immediately
-      if (['gm','admin'].includes(profile.role)) {
+      if (['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role)) {
         await supabase.from('schedules').update({ status: 'approved', approved_at: new Date().toISOString(), approved_by: profile.id }).eq('week_starting', weekStart)
         const approved = data.map((s: any) => ({ ...s, status: 'approved' }))
         setSchedules((prev: any[]) => [...prev.filter((s: any) => s.week_starting !== weekStart), ...approved])
@@ -718,7 +718,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPendingSwaps, pendingAttendance, setPendingAttendance, profile, supabase }: any) {
 
   const [loading, setLoading] = useState<string|null>(null)
-  const isGM = profile.role === 'gm' || profile.is_admin === true
+  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role) || profile.is_admin === true
 
   const approveDayOff = async (id: string, action: 'approve'|'deny') => {
     setLoading(id+action)
@@ -823,7 +823,7 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
 function SettingsTab({ rushConfig, setRushConfig, profile, supabase }: any) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const isGM = profile.role === 'gm' || profile.is_admin === true
+  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role) || profile.is_admin === true
   const weekday = rushConfig.find((r: any) => r.day_type === 'weekday') || { rush_start: '15:00', rush_end: '21:00' }
   const weekend = rushConfig.find((r: any) => r.day_type === 'weekend') || { rush_start: '08:00', rush_end: '00:00' }
   const [wdStart, setWdStart] = useState(weekday.rush_start)
