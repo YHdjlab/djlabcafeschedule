@@ -380,10 +380,10 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
       const fmtH = (h: number) => { if (h === 0 || h === 24) return '12am'; if (h < 12) return h + 'am'; if (h === 12) return '12pm'; return (h-12) + 'pm' }
 
-      // Find bench staff - available but not assigned
+      // Find bench staff - available but not assigned (only from STAFF_MAP to ensure they render)
       const assignedIds = new Set([supervisor_id, bar_staff_id, floor_staff1_id, floor_staff2_id].filter(Boolean))
       const benchStaff = availStaff
-        .filter((id: string) => !assignedIds.has(id))
+        .filter((id: string) => !assignedIds.has(id) && STAFF_MAP[id])
         .map((id: string) => ({ id, role: 'Available', info: getStaffHours(id, dateStr) }))
 
       built.push({
