@@ -29,8 +29,8 @@ export default async function SchedulePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#323232] tracking-tight">Schedule</h1>
-        <p className="text-gray-500 text-sm mt-1">{isAdmin ? 'Full team schedule' : 'Your upcoming shifts'}</p>
+        <h1 style={{color:'#F7F0E8',fontSize:'22px',fontWeight:800,marginBottom:'4px'}}>Schedule</h1>
+        <p style={{color:'rgba(247,240,232,0.45)',fontSize:'13px',marginBottom:'20px'}}>{isAdmin ? 'Full team schedule' : 'Your upcoming shifts'}</p>
       </div>
       <ScheduleView schedules={allSchedules || []} profile={profile} isAdmin={isAdmin} availability={availability || []}/>
     </div>

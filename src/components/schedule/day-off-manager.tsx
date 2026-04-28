@@ -67,7 +67,7 @@ export function DayOffManager({ profile, requests: initial }: Props) {
       </div>
 
       {showForm && (
-        <Card>
+        <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}>
           <CardHeader><CardTitle>New Day Off Request</CardTitle></CardHeader>
           <form onSubmit={submit} className="space-y-4">
             <Input label="Date" type="date" value={date} onChange={e => setDate(e.target.value)} required min={new Date().toISOString().slice(0,10)}/>
@@ -75,29 +75,29 @@ export function DayOffManager({ profile, requests: initial }: Props) {
             {error && <p className="text-sm text-red-500">{error}</p>}
             <Button type="submit" loading={loading} className="w-full">Submit Request</Button>
           </form>
-        </Card>
+        </div>
       )}
 
       <div className="space-y-3">
         {requests.length === 0 ? (
-          <Card>
+          <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}>
             <p className="text-center text-gray-400 text-sm py-8">No day off requests yet</p>
-          </Card>
+          </div>
         ) : requests.map(req => (
-          <Card key={req.id} padding="sm">
+          <div key={req.id} style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'16px'}}>
             <div className="flex items-center justify-between p-1">
               <div>
-                <p className="font-semibold text-[#323232]">
+                <p style={{color:'#F7F0E8',fontSize:'14px',fontWeight:600}}>
                   {format(new Date(req.date_off + 'T00:00:00'), 'EEEE, MMM d yyyy')}
                 </p>
-                {req.reason && <p className="text-sm text-gray-500 mt-0.5">{req.reason}</p>}
-                <p className="text-xs text-gray-400 mt-1">
+                {req.reason && <p style={{color:'rgba(247,240,232,0.45)',fontSize:'12px',marginTop:'2px'}}>{req.reason}</p>}
+                <p style={{color:'rgba(247,240,232,0.3)',fontSize:'11px',marginTop:'4px'}}>
                   Submitted {format(new Date(req.created_at), 'MMM d, yyyy')}
                 </p>
               </div>
               <Badge variant={STATUS_COLORS[req.status]}>{STATUS_LABELS[req.status]}</Badge>
             </div>
-          </Card>
+          </div>
         ))}
       </div>
     </div>

@@ -72,14 +72,14 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
 
   return (
     <div className="space-y-6">
-      <Card>
+      <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}>
         <CardHeader><CardTitle>Today's Attendance</CardTitle></CardHeader>
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 rounded-xl bg-[#F7F0E8]">
+          <div style={{display:'flex',alignItems:'center',gap:'12px',padding:'14px',borderRadius:'12px',backgroundColor:'rgba(255,255,255,0.06)'}}>
             <Clock size={20} className="text-[#FF6357]"/>
             <div>
-              <p className="text-sm font-medium text-[#323232]">Current time (Beirut)</p>
-              <p className="text-2xl font-bold text-[#323232]">{timeStr}</p>
+              <p style={{color:'#F7F0E8',fontSize:'13px',fontWeight:500}}>Current time (Beirut)</p>
+              <p style={{color:'#F7F0E8',fontSize:'24px',fontWeight:800}}>{timeStr}</p>
             </div>
             <div className="ml-auto">
               <Badge variant={isRush ? 'coral' : 'blue'}>{isRush ? 'Rush Hour' : 'Off-Rush'}</Badge>
@@ -96,7 +96,7 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
             </div>
           ) : (
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8]">
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)'}}>
                 <div>
                   <p className="text-xs text-gray-500">Check-in time</p>
                   <p className="font-semibold text-[#323232]">{todayRecord.checkin_time}</p>
@@ -122,17 +122,17 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
 
           {error && <p className="text-sm text-red-500 text-center">{error}</p>}
         </div>
-      </Card>
+      </div>
 
-      <Card>
+      <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}>
         <CardHeader><CardTitle>Recent Attendance</CardTitle></CardHeader>
         <div className="space-y-2">
           {recentAttendance.length === 0 ? (
             <p className="text-center text-gray-400 text-sm py-4">No attendance records yet</p>
           ) : recentAttendance.map(rec => (
-            <div key={rec.id} className="flex items-center justify-between p-3 rounded-xl bg-[#F7F0E8]">
+            <div key={rec.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)'}}>
               <div>
-                <p className="text-sm font-medium text-[#323232]">{format(new Date(rec.date + 'T00:00:00'), 'EEE, MMM d')}</p>
+                <p style={{color:'#F7F0E8',fontSize:'13px',fontWeight:500}}>{format(new Date(rec.date + 'T00:00:00'), 'EEE, MMM d')}</p>
                 <p className="text-xs text-gray-500">
                   {rec.checkin_time}{rec.checkout_time ? " - " + rec.checkout_time : ""}
                 </p>
@@ -144,7 +144,7 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
             </div>
           ))}
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

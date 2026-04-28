@@ -19,8 +19,8 @@ export default async function AvailabilityPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#323232] tracking-tight">My Availability</h1>
-        <p className="text-gray-500 text-sm mt-1">Pick your shifts for the week. Max 2 of each type (AM/MID/PM). Fri/Sat/Sun are mandatory.</p>
+        <h1 style={{color:'#F7F0E8',fontSize:'22px',fontWeight:800,marginBottom:'4px'}}>My Availability</h1>
+        <p style={{color:'rgba(247,240,232,0.45)',fontSize:'13px',marginBottom:'20px'}}>Pick your shifts for the week. Max 2 of each type (AM/MID/PM). Fri/Sat/Sun are mandatory.</p>
       </div>
       <AvailabilityGrid
         profile={profile}

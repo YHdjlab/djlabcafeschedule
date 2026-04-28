@@ -26,8 +26,8 @@ export default async function SwapsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-[#323232] tracking-tight">Shift Swaps</h1>
-        <p className="text-gray-500 text-sm mt-1">Request and manage shift swaps</p>
+        <h1 style={{color:'#F7F0E8',fontSize:'22px',fontWeight:800,marginBottom:'4px'}}>Shift Swaps</h1>
+        <p style={{color:'rgba(247,240,232,0.45)',fontSize:'13px',marginBottom:'20px'}}>Request and manage shift swaps</p>
       </div>
       <SwapManager profile={profile} swapRequests={swaps||[]} staff={staff||[]} schedules={schedules||[]}/>
     </div>

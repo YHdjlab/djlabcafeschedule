@@ -35,22 +35,22 @@ export function PasswordChange({ profile }: { profile: any }) {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader><CardTitle>Your Profile</CardTitle></CardHeader>
+      <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}>
+        <p style={{color:'rgba(247,240,232,0.45)',fontSize:'11px',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'14px'}}>Your Profile</p>
         <div className="flex items-center gap-4 p-1">
           <div className="w-14 h-14 rounded-full bg-[#323232] flex items-center justify-center">
             <span className="text-white text-xl font-bold">{profile.full_name?.charAt(0)}</span>
           </div>
           <div>
-            <p className="font-bold text-[#323232] text-lg">{profile.full_name}</p>
-            <p className="text-sm text-gray-400">{profile.email}</p>
-            <p className="text-xs text-[#FF6357] font-semibold mt-0.5 capitalize">{profile.role?.replace(/_/g, ' ')}</p>
+            <p style={{color:'#F7F0E8',fontSize:'16px',fontWeight:700}}>{profile.full_name}</p>
+            <p style={{color:'rgba(247,240,232,0.45)',fontSize:'12px'}}>{profile.email}</p>
+            <p style={{color:'#FF6357',fontSize:'11px',fontWeight:600,marginTop:'2px',textTransform:'capitalize'}}>{profile.role?.replace(/_/g, ' ')}</p>
           </div>
         </div>
-      </Card>
+      </div>
 
-      <Card>
-        <CardHeader><CardTitle>Change Password</CardTitle></CardHeader>
+      <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}>
+        <p style={{color:'rgba(247,240,232,0.45)',fontSize:'11px',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em',marginBottom:'14px'}}>Change Password</p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Current Password"
@@ -92,7 +92,7 @@ export function PasswordChange({ profile }: { profile: any }) {
             Update Password
           </Button>
         </form>
-      </Card>
+      </div>
     </div>
   )
 }

@@ -107,16 +107,14 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
           const endH = slot ? timeToH(slot.end_time) : 24
 
           return (
-            <div key={dateStr} className="bg-white rounded-3xl shadow-sm border border-black/5"
-              style={{outline: isToday ? '2px solid #FF6357' : '1px solid rgba(0,0,0,0.06)'}}>
+            <div key={dateStr} style={{backgroundColor:'#242424',borderRadius:'16px',border: isToday ? '2px solid #FF6357' : '1px solid rgba(255,255,255,0.08)',boxShadow:'0 4px 24px rgba(0,0,0,0.3)',overflow:'hidden'}}>
 
               {/* Day header */}
-              <div className="px-8 py-5 flex items-center justify-between"
-                style={{backgroundColor: isToday ? '#FF6357' : '#323232'}}>
+              <div style={{padding:'16px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px',background: isToday ? '#FF6357' : 'linear-gradient(135deg,#2a2a2a,#1e1e1e)'}}>
                 <div className="flex items-center gap-3">
                   <div>
-                    <p className="font-black text-white text-2xl">{dayName}</p>
-                    <p className="text-xs text-white/50">{format(date, 'MMMM d, yyyy')}</p>
+                    <p style={{color:'#F7F0E8',fontSize:'20px',fontWeight:900,lineHeight:1,letterSpacing:'-0.02em'}}>{dayName}</p>
+                    <p style={{color:'rgba(247,240,232,0.45)',fontSize:'11px',marginTop:'2px'}}>{format(date, 'MMMM d, yyyy')}</p>
                   </div>
                   {isWeekend && <span className="text-xs px-2.5 py-1 rounded-full font-semibold text-white" style={{backgroundColor: 'rgba(255,255,255,0.15)'}}>Full Rush</span>}
                   {hasMyShift && <span className="text-xs px-2.5 py-1 rounded-full font-bold text-white" style={{backgroundColor: '#FF6357', outline: isToday ? '1px solid rgba(255,255,255,0.4)' : 'none'}}>Your shift</span>}
@@ -136,7 +134,7 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
               {slot ? (
                 <>
                   {/* Rush band */}
-                  <div className="px-8 py-3 bg-white border-b border-black/5 flex items-center gap-4">
+                  <div style={{padding:'8px 20px',backgroundColor:'#1e1e1e',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',gap:'12px'}}>
                     <div className="flex-1 h-2 rounded-full bg-gray-100 relative overflow-hidden">
                       <div className="absolute h-full bg-blue-200 rounded-full" style={{left: '0%', width: ((15-8)/16*100)+'%'}}/>
                       <div className="absolute h-full bg-orange-300 rounded-full" style={{left: ((15-8)/16*100)+'%', width: ((21-15)/16*100)+'%'}}/>
@@ -156,12 +154,7 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
                       const sEnd = sh ? sh.endH : endH
                       const sTotalH = sh ? sh.totalH : (endH - startH)
                       return (
-                      <div key={i} className="rounded-2xl px-5 py-4 flex items-center justify-between gap-4"
-                        style={{
-                          backgroundColor: s.isMe ? 'rgba(255,99,87,0.06)' : `${s.color}10`,
-                          border: `1px solid ${s.isMe ? 'rgba(255,99,87,0.2)' : s.color + '20'}`,
-                          outline: s.isMe ? '2px solid #FF6357' : 'none'
-                        }}>
+                      <div key={i} style={{borderRadius:'12px',padding:'12px 14px',border: s.isMe ? '1px solid rgba(255,99,87,0.4)' : '1px solid rgba(255,255,255,0.08)',backgroundColor: s.isMe ? 'rgba(255,99,87,0.1)' : 'rgba(255,255,255,0.04)',outline: s.isMe ? '2px solid #FF6357' : 'none'}}>
                         <div className="flex items-center gap-4 flex-1 min-w-0">
                           <div className="w-11 h-11 rounded-full flex items-center justify-center text-white text-base font-bold flex-shrink-0"
                             style={{backgroundColor: s.isMe ? '#FF6357' : s.color}}>
@@ -169,7 +162,7 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
-                              <p className="text-base font-bold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
+                              <p style={{color:'#F7F0E8',fontSize:'14px',fontWeight:700}}>{s.full_name?.split(' ')[0]}</p>
                               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{color: s.isMe ? '#FF6357' : s.color, backgroundColor: s.isMe ? 'rgba(255,99,87,0.1)' : `${s.color}15`}}>{s.role}</span>
                               {s.isMe && <span className="text-xs font-bold text-[#FF6357]">You</span>}
                               <span className="text-xs font-bold text-[#FF6357] ml-auto">{sTotalH}h</span>
@@ -194,7 +187,7 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
                             </div>
                             <div className="relative mt-1" style={{height:'12px'}}>
                               {[8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(h => (
-                                <span key={h} className="absolute text-gray-400" style={{left:((h-8)/16*100)+'%',fontSize:'8px',fontWeight:600,transform:'translateX(-50%)',whiteSpace:'nowrap'}}>
+                                <span key={h} style={{position:'absolute',color:'rgba(247,240,232,0.3)',fontSize:'8px',fontWeight:600,transform:'translateX(-50%)',whiteSpace:'nowrap'}} style={{left:((h-8)/16*100)+'%',fontSize:'8px',fontWeight:600,transform:'translateX(-50%)',whiteSpace:'nowrap'}}>
                                   {h===24?'12a':h===12?'12p':h>12?(h-12)+'p':h+'a'}
                                 </span>
                               ))}
@@ -207,10 +200,10 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
                   </div>
                 </>
               ) : (
-                <div className="px-6 py-10 text-center">
-                  <Calendar size={28} className="text-gray-200 mx-auto mb-3"/>
-                  <p className="text-sm text-gray-400 font-medium">No shifts scheduled</p>
-                  <p className="text-xs text-gray-300 mt-1">Check back after the schedule is published</p>
+                <div style={{padding:'40px 24px',textAlign:'center'}}>
+                  <Calendar size={28} style={{color:'rgba(247,240,232,0.2)',margin:'0 auto 12px'}}/>
+                  <p style={{color:'rgba(247,240,232,0.45)',fontSize:'13px',fontWeight:500}}>No shifts scheduled</p>
+                  <p style={{color:'rgba(247,240,232,0.25)',fontSize:'11px',marginTop:'4px'}}>Check back after the schedule is published</p>
                 </div>
               )}
             </div>

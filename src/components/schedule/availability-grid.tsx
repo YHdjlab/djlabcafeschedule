@@ -159,23 +159,23 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
       {/* Week nav */}
       <div className="bg-white rounded-3xl border border-black/[0.06] shadow-sm p-4 flex items-center justify-between">
         <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()-7); setWeekStart(format(d,'yyyy-MM-dd')); setSelections({}); setSubmitted(false) }}
-          className="w-10 h-10 rounded-2xl bg-[#F7F0E8] flex items-center justify-center hover:bg-black/10 transition-colors">
-          <ChevronLeft size={18}/>
+          style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',color:'#F7F0E8',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+          <ChevronLeft size={16}/>
         </button>
-        <div className="text-center">
-          <p className="font-bold text-[#323232]">{format(monday,'MMM d')} — {format(addDays(monday,6),'MMM d, yyyy')}</p>
-          <p className="text-xs text-gray-400 mt-0.5">{totalShifts} shifts selected this week</p>
+        <div style={{textAlign:'center'}}>
+          <p style={{color:'#F7F0E8',fontSize:'14px',fontWeight:700}}>{format(monday,'MMM d')} — {format(addDays(monday,6),'MMM d, yyyy')}</p>
+          <p style={{color:'rgba(247,240,232,0.45)',fontSize:'12px',marginTop:'2px'}}>{totalShifts} shifts selected this week</p>
         </div>
         <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()+7); setWeekStart(format(d,'yyyy-MM-dd')); setSelections({}); setSubmitted(false) }}
-          className="w-10 h-10 rounded-2xl bg-[#F7F0E8] flex items-center justify-center hover:bg-black/10 transition-colors">
-          <ChevronRight size={18}/>
+          style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',color:'#F7F0E8',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+          <ChevronRight size={16}/>
         </button>
       </div>
 
       {/* Shift type counter */}
       <div className="grid grid-cols-3 gap-3">
         {SHIFTS.map(shift => (
-          <div key={shift.key} className={cn('rounded-2xl border p-3 text-center', shift.bg, shift.border)}>
+          <div key={shift.key} style={{backgroundColor:'#242424',borderRadius:'12px',border:'1px solid rgba(255,255,255,0.08)',padding:'14px',textAlign:'center'}}>
             <p className="text-lg">{shift.icon}</p>
             <p className={cn('text-sm font-bold', shift.textColor)}>{shift.key}</p>
             <p className="text-xs text-gray-400">{shift.time}</p>
@@ -202,15 +202,14 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
 
           return (
             <div key={day} className={cn('bg-white rounded-3xl border shadow-sm',
-              isWeekend ? 'border-orange-200' : 'border-black/[0.06]'
-            )}>
+              isWeekend ? 'border-orange-200' : 'border-black/[0.06]'>
               {/* Day header */}
               <div className={cn('px-5 py-3 flex items-center justify-between',
                 isWeekend ? 'bg-orange-50' : 'bg-[#F7F0E8]'
               )}>
                 <div className="flex items-center gap-2">
-                  <p className="font-bold text-[#323232]">{FULL_DAYS[dayIndex]}</p>
-                  <p className="text-xs text-gray-400">{format(date, 'MMM d')}</p>
+                  <p style={{color:'#F7F0E8',fontSize:'14px',fontWeight:700}}>{FULL_DAYS[dayIndex]}</p>
+                  <p style={{color:'rgba(247,240,232,0.45)',fontSize:'11px'}}>{format(date, 'MMM d')}</p>
                   {isWeekend && <span className="text-xs px-2 py-0.5 rounded-full bg-orange-200 text-orange-700 font-semibold">Mandatory</span>}
                   {isSunday && <span className="text-xs px-2 py-0.5 rounded-full bg-purple-100 text-purple-600 font-semibold">Free pick</span>}
                 </div>
@@ -250,11 +249,11 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
       </div>
 
       {/* Submit */}
-      <div className="bg-white rounded-3xl border border-black/[0.06] shadow-sm p-5 flex items-center justify-between gap-4">
+      <div style={{backgroundColor:'#242424',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.08)',padding:'16px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}}>
         <div>
-          <p className="font-bold text-[#323232]">{totalShifts} shifts selected</p>
-          <p className="text-xs text-gray-400 mt-0.5">AM: {shiftCounts.AM}/2 · MID: {shiftCounts.MID}/2 · PM: {shiftCounts.PM}/2</p>
-          {savedMsg && <p className="text-xs text-green-600 font-semibold mt-1">{savedMsg}</p>}
+          <p style={{color:'#F7F0E8',fontSize:'14px',fontWeight:700}}>{totalShifts} shifts selected</p>
+          <p style={{color:'rgba(247,240,232,0.45)',fontSize:'12px',marginTop:'2px'}}>AM: {shiftCounts.AM}/2 · MID: {shiftCounts.MID}/2 · PM: {shiftCounts.PM}/2</p>
+          {savedMsg && <p style={{color:'#22c55e',fontSize:'12px',fontWeight:600,marginTop:'4px'}}>{savedMsg}</p>}
         </div>
         {submitted ? (
           <span className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-green-100 text-green-700 text-sm font-bold">

@@ -86,7 +86,7 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
   }
 
   return (
-    <div className="space-y-4">
+    <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
       <div className="flex justify-end">
         <Button onClick={() => setShowForm(!showForm)} size="sm">
           {showForm ? <><X size={14} className="mr-1.5"/>Cancel</> : <><Plus size={14} className="mr-1.5"/>Request Swap</>}
@@ -94,9 +94,9 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
       </div>
 
       {showForm && (
-        <Card>
+        <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}>
           <CardHeader><CardTitle>New Swap Request</CardTitle></CardHeader>
-          <form onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} style={{display:'flex',flexDirection:'column',gap:'16px'}}>
             <Select
               label="Swap with"
               value={form.staffBId}
@@ -121,26 +121,26 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
             {error && <p className="text-sm text-red-500">{error}</p>}
             <Button type="submit" loading={loading} className="w-full">Submit Request</Button>
           </form>
-        </Card>
+        </div>
       )}
 
       <div className="space-y-3">
         {swaps.length === 0 ? (
-          <Card><p className="text-center text-gray-400 text-sm py-8">No swap requests</p></Card>
+          <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'20px'}}><p className="text-center text-gray-400 text-sm py-8">No swap requests</p></div>
         ) : swaps.map(swap => {
           const isStaffB = swap.staff_b_id === profile.id
           const canRespond = isStaffB && swap.status === 'pending_staff_b'
           const canApprove = isAdmin && swap.status === 'pending_supervisor'
 
           return (
-            <Card key={swap.id} padding="sm">
+            <div key={swap.id} style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'16px'}}>
               <div className="p-2 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-[#323232] text-sm">
+                    <p style={{color:'#F7F0E8',fontSize:'14px',fontWeight:600}}>
                       {swap.staff_a?.full_name} ? {swap.staff_b?.full_name}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p style={{color:'rgba(247,240,232,0.45)',fontSize:'12px',marginTop:'2px'}}>
                       {swap.shift_date && format(new Date(swap.shift_date + 'T00:00:00'), 'EEE MMM d')}
                       {swap.shift_label && " - " + swap.shift_label}
                     </p>
@@ -171,7 +171,7 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
                   </div>
                 )}
               </div>
-            </Card>
+            </div>
           )
         })}
       </div>
