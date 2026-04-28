@@ -667,10 +667,18 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 .filter((h: number) => h >= 0)
                                 .sort((a: number, b: number) => a - b)
                               const newInfo = newHours.length ? { startH: newHours[0], endH: newHours[newHours.length-1]+1, totalH: newHours[newHours.length-1]+1-newHours[0], hours: newHours } : null
-                              // Replace member, remove new person from bench if they were there
+                              // Swap: new person takes role, old person becomes Available
+                              const oldMember = { id: member.id, role: 'Available', info: member.info }
                               const newStaff = gs.staff
-                                .map((m: any) => m.id === member.id ? { ...m, id: newId, info: newInfo } : m)
-                                .filter((m: any, idx: number, arr: any[]) => arr.findIndex((x: any) => x.id === m.id) === idx)
+                                .map((m: any) => {
+                                  if (m.id === member.id) return { ...m, id: newId, info: newInfo } // new person takes role
+                                  if (m.id === newId) return null // remove from bench
+                                  return m
+                                })
+                                .filter(Boolean)
+                              // Add old person to bench if not already there
+                              const alreadyInStaff = newStaff.some((m: any) => m.id === oldMember.id)
+                              if (!alreadyInStaff) newStaff.push(oldMember)
                               return { ...updated, staff: newStaff }
                             }))
                           }}
