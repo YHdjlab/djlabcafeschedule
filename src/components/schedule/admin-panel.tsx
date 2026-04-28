@@ -616,7 +616,23 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                           </div>
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <p className="text-sm font-bold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
-                            <span className={cn("text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border", roleBg, roleTextColor)}>{member.role}</span>
+                            {member.role !== 'Available' && member.role !== 'Supervisor' ? (
+                              <select value={member.role} onChange={e => {
+                                const newRole = e.target.value
+                                // Also update the field mapping
+                                setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
+                                  if (gs.key !== slot.key) return gs
+                                  const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, role: newRole } : m)
+                                  return { ...gs, staff: newStaff }
+                                }))
+                              }} className={cn("text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border cursor-pointer", roleBg, roleTextColor)}>
+                                <option value="Bar">BAR</option>
+                                <option value="Floor">FLOOR</option>
+                                <option value="Floor">FLOOR 2</option>
+                              </select>
+                            ) : (
+                              <span className={cn("text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border", roleBg, roleTextColor)}>{member.role}</span>
+                            )}
                             {info && <span className="text-xs font-bold text-[#FF6357]">{info.totalH}h</span>}
                           </div>
                           {/* Assign button for bench staff */}
