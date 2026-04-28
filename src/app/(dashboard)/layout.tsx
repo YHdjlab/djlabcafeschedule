@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase-server"
 import { redirect } from "next/navigation"
-import { Sidebar } from "@/components/layout/sidebar"
+import { Navbar } from "@/components/layout/navbar"
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -10,12 +10,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!profile) redirect("/login")
   return (
     <div style={{minHeight:"100vh", backgroundColor:"#F7F0E8"}}>
-      <Sidebar profile={profile}/>
-      <main className="hidden lg:block" style={{marginLeft:"260px", minHeight:"100vh"}}>
-        <div style={{padding:"32px 40px 64px 32px"}}>{children}</div>
-      </main>
-      <main className="lg:hidden" style={{minHeight:"100vh"}}>
-        <div style={{padding:"72px 20px 48px 20px"}}>{children}</div>
+      <Navbar profile={profile}/>
+      <main style={{paddingTop:"64px"}}>
+        <div style={{padding:"32px 40px 64px 40px", maxWidth:"1400px", margin:"0 auto"}}>{children}</div>
       </main>
     </div>
   )
