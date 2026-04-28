@@ -92,7 +92,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
         {open ? <X size={18}/> : <Menu size={18}/>}
       </button>
       {open && <div className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm" onClick={() => setOpen(false)}/>}
-      <aside className="hidden lg:flex lg:flex-col sticky top-0 h-screen w-60 z-30">
+      <aside className="hidden lg:flex lg:flex-col fixed left-0 top-0 h-full w-60 z-30">
         <Inner/>
       </aside>
       <aside className={cn('lg:hidden fixed left-0 top-0 h-full w-64 z-50 transition-transform duration-300', open ? 'translate-x-0' : '-translate-x-full')}>
