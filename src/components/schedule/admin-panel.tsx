@@ -610,7 +610,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                       )}
                       <div key={member.id} className={cn("rounded-2xl border px-5 py-4", roleBg, member.role === 'Available' && 'opacity-70')}>
                         {/* Top row */}
-                        <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center gap-2 mb-3 flex-nowrap">
                           <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
                             {s.full_name?.charAt(0)}
                           </div>
@@ -673,7 +673,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, role: 'Available' } : m)
                                 return { ...updated, staff: newStaff }
                               }))
-                            }} className="w-6 h-6 rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-500 flex items-center justify-center flex-shrink-0 transition-colors text-gray-400 text-xs font-bold">✕</button>
+                            }} className="w-6 h-6 rounded-full bg-gray-100 hover:bg-red-100 hover:text-red-500 flex items-center justify-center flex-shrink-0 transition-colors text-gray-400 text-xs font-bold border border-gray-200">✕</button>
                           )}
                           {/* Swap button for assigned staff */}
                           {member.role !== 'Available' && alts.length > 0 && (
@@ -701,6 +701,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                               {alts.map((sid: string) => <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>)}
                             </select>
                           )}
+                          </div>{/* end action buttons */}
                         </div>
                         {/* Timeline */}
                         <div className="w-full">
