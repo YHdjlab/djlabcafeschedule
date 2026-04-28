@@ -52,7 +52,7 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+      <div className="flex gap-2 flex-wrap pb-1">
         {TABS.map((t: any) => (
           <button
             key={t.id}
