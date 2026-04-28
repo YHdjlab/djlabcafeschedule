@@ -516,7 +516,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
       {generatedSlots.length > 0 ? (
         <div className="space-y-8">
-          <div className="bg-white rounded-2xl border border-black/5 p-4 flex items-center justify-between gap-4 overflow-hidden">
+          <div className="bg-white rounded-2xl border border-black/5 p-4 flex items-center justify-between gap-4">
             <div>
               <h3 className="font-bold text-[#323232]">Schedule Preview</h3>
               <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use Swap dropdowns to override.</p>
@@ -535,7 +535,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
               return Array.from(staffSet)
             })()
             return (
-              <div key={slot.key} className={cn('bg-white rounded-2xl overflow-hidden shadow-sm w-full', slot.issues?.length ? 'ring-2 ring-red-200' : 'ring-1 ring-black/5')}>
+              <div key={slot.key} className={cn('bg-white rounded-2xl overflow-hidden shadow-sm w-full', slot.issues?.length ? 'border-2 border-red-200' : 'border border-black/5')}>
                 {/* Day header */}
                 <div className={cn('px-6 py-5 flex items-center justify-between gap-4', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')}>
                   <div className="flex items-center gap-3">
