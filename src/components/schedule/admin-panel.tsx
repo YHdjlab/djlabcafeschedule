@@ -565,7 +565,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                   </div>
                 )}
                 {/* Staff grid */}
-                <div className="px-6 py-4 space-y-3">
+                <div className="px-4 py-4 space-y-3">
                   {(slot.staff || []).map((member: any, memberIdx: number) => {
                     const isFirstBench = member.role === 'Available' && memberIdx > 0 && slot.staff[memberIdx-1]?.role !== 'Available'
                     const canAddToShift = member.role === 'Available'
@@ -608,7 +608,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                           <div className="flex-1 h-px bg-gray-200"/>
                         </div>
                       )}
-                      <div key={member.id} className={cn("rounded-2xl border px-5 py-4", roleBg, member.role === 'Available' && 'opacity-70')}>
+                      <div key={member.id} className={cn("rounded-2xl border px-4 py-3", roleBg, member.role === 'Available' && 'opacity-70')}>
                         {/* Top row */}
                         <div className="flex items-center gap-2 mb-3 flex-nowrap">
                           <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>

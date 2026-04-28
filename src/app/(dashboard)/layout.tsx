@@ -9,14 +9,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
   if (!profile) redirect("/login")
   return (
-    <div className="min-h-screen bg-[#F7F0E8]">
-      <Sidebar profile={profile}/>
-      <main className="min-h-screen hidden lg:block" style={{marginLeft: "240px"}}>
-        <div style={{padding: "36px 40px 60px 40px"}}>{children}</div>
-      </main>
-      <main className="min-h-screen lg:hidden">
-        <div style={{padding: "72px 20px 48px 20px"}}>{children}</div>
-      </main>
+    <div style={{display:'flex', minHeight:'100vh', backgroundColor:'#F7F0E8'}}>
+      <div style={{width:'240px', flexShrink:0}}>
+        <Sidebar profile={profile}/>
+      </div>
+      <div style={{flex:1, minWidth:0, overflowX:'hidden'}} className="hidden lg:block">
+        <div style={{padding:'36px 40px 60px 40px'}}>{children}</div>
+      </div>
+      <div style={{flex:1, minWidth:0}} className="lg:hidden">
+        <div style={{padding:'72px 20px 48px 20px'}}>{children}</div>
+      </div>
     </div>
   )
 }
