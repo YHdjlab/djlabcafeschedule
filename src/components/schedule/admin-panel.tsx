@@ -609,47 +609,50 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                         </div>
                       )}
                       <div key={member.id} className={cn("rounded-2xl border px-5 py-4", roleBg, member.role === 'Available' && 'opacity-70')}>
-                        {/* Top row: avatar + name + role + hours + swap */}
+                        {/* Top row */}
                         <div className="flex items-center gap-3 mb-3">
                           <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
                             {s.full_name?.charAt(0)}
                           </div>
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <p className="text-sm font-bold text-[#323232]">{s.full_name?.split(' ')[0]}</p>
-                            <span className={cn("text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full", roleBg, roleTextColor, "border")}>{member.role}</span>
+                            <span className={cn("text-xs font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border", roleBg, roleTextColor)}>{member.role}</span>
                             {info && <span className="text-xs font-bold text-[#FF6357]">{info.totalH}h</span>}
-                          {member.role === 'Available' ? (
-                            /* Assign bench staff to a role */
+                          </div>
+                          {/* Assign button for bench staff */}
+                          {member.role === 'Available' && (
                             <select value="" onChange={e => {
                               if (!e.target.value) return
                               const assignRole = e.target.value
-                              const staffRole = STAFF_MAP[member.id]?.role || ''
-                              const roleFieldMap: Record<string,string> = {
-                                'Supervisor': 'supervisor_id',
-                                'Bar': 'bar_staff_id',
-                                'Floor1': 'floor_staff1_id',
-                                'Floor2': 'floor_staff2_id',
-                              }
+                              const roleFieldMap: Record<string,string> = { 'Supervisor': 'supervisor_id', 'Bar': 'bar_staff_id', 'Floor1': 'floor_staff1_id', 'Floor2': 'floor_staff2_id' }
                               const fld = roleFieldMap[assignRole]
                               if (!fld) return
                               setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
                                 if (gs.key !== slot.key) return gs
-                                const newStaff = gs.staff
-                                  .map((m: any) => m.id === member.id ? { ...m, role: assignRole === 'Floor1' || assignRole === 'Floor2' ? 'Floor' : assignRole } : m)
-                                  .filter(Boolean)
+                                const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, role: assignRole === 'Floor1' || assignRole === 'Floor2' ? 'Floor' : assignRole } : m)
                                 return { ...gs, [fld]: member.id, staff: newStaff }
                               }))
-                            }}
-                              className="text-xs rounded-xl px-2 py-1 border-2 cursor-pointer font-bold bg-white text-[#FF6357] border-[#FF6357]/30 flex-shrink-0">
+                            }} className="text-xs rounded-xl px-2 py-1 border-2 cursor-pointer font-bold bg-white text-[#FF6357] border-[#FF6357]/30 flex-shrink-0">
                               <option value="">+ Assign</option>
                               {!slot.supervisor_id && ['supervisor_floor','supervisor_bar','admin'].includes(STAFF_MAP[member.id]?.role) && <option value="Supervisor">As Supervisor</option>}
-                              {!slot.bar_staff_id && ['bar','supervisor_bar','floor','supervisor_floor'].includes(STAFF_MAP[member.id]?.role) && <option value="Bar">As Bar</option>}
-                              {!slot.floor_staff1_id && ['floor','supervisor_floor','bar','supervisor_bar'].includes(STAFF_MAP[member.id]?.role) && <option value="Floor1">As Floor</option>}
-                              {slot.floor_staff1_id && !slot.floor_staff2_id && ['floor','supervisor_floor','bar','supervisor_bar'].includes(STAFF_MAP[member.id]?.role) && <option value="Floor2">As 2nd Floor</option>}
-                              {/* Always allow adding as extra supervisor for overlap shifts */}
-                              {slot.supervisor_id && ['supervisor_floor','supervisor_bar','admin'].includes(STAFF_MAP[member.id]?.role) && <option value="Floor1">Cover Overlap</option>}
+                              {!slot.bar_staff_id && <option value="Bar">As Bar</option>}
+                              {!slot.floor_staff1_id && <option value="Floor1">As Floor</option>}
+                              {slot.floor_staff1_id && !slot.floor_staff2_id && <option value="Floor2">As 2nd Floor</option>}
                             </select>
-                          ) : alts.length > 0 && (
+                          )}
+                          {/* Unassign button for assigned staff */}
+                          {member.role !== 'Available' && (
+                            <button onClick={() => {
+                              setGeneratedSlots((prev: any[]) => prev.map((gs: any) => {
+                                if (gs.key !== slot.key) return gs
+                                const updated = { ...gs, [fieldName]: null }
+                                const newStaff = gs.staff.map((m: any) => m.id === member.id ? { ...m, role: 'Available' } : m)
+                                return { ...updated, staff: newStaff }
+                              }))
+                            }} className="w-6 h-6 rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-500 flex items-center justify-center flex-shrink-0 transition-colors text-gray-400 text-xs font-bold">✕</button>
+                          )}
+                          {/* Swap button for assigned staff */}
+                          {member.role !== 'Available' && alts.length > 0 && (
                             <select value="" onChange={e => {
                               if (!e.target.value) return
                               const newId = e.target.value
@@ -658,81 +661,52 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 const newHours = weekAvailability
                                   .filter((a: any) => a.staff_id === newId && a.slot_date === gs.date)
                                   .map((a: any) => { const match = a.slot_key.match(/_h(\d+)$/); return match ? parseInt(match[1]) : -1 })
-                                  .filter((h: number) => h >= 0)
-                                  .sort((a: number, b: number) => a - b)
+                                  .filter((h: number) => h >= 0).sort((a: number, b: number) => a - b)
                                 const newInfo = newHours.length ? { startH: newHours[0], endH: newHours[newHours.length-1]+1, totalH: newHours[newHours.length-1]+1-newHours[0], hours: newHours } : null
                                 const oldMember = { id: member.id, role: 'Available', info: member.info }
-                                const newStaff = gs.staff
-                                  .map((m: any) => {
-                                    if (m.id === member.id) return { ...m, id: newId, info: newInfo }
-                                    if (m.id === newId) return null
-                                    return m
-                                  })
-                                  .filter(Boolean)
-                                const alreadyInStaff = newStaff.some((m: any) => m.id === oldMember.id)
-                                if (!alreadyInStaff) newStaff.push(oldMember)
+                                const newStaff = gs.staff.map((m: any) => {
+                                  if (m.id === member.id) return { ...m, id: newId, info: newInfo }
+                                  if (m.id === newId) return null
+                                  return m
+                                }).filter(Boolean)
+                                if (!newStaff.some((m: any) => m.id === oldMember.id)) newStaff.push(oldMember)
                                 return { ...(fieldName === '__bench__' ? gs : { ...gs, [fieldName]: newId }), staff: newStaff }
                               }))
-                            }}
-                              className={cn("text-xs rounded-xl px-2 py-1 border-2 cursor-pointer font-bold bg-white flex-shrink-0", roleTextColor, "border-current/30")}>
+                            }} className={cn("text-xs rounded-xl px-2 py-1 border-2 cursor-pointer font-bold bg-white flex-shrink-0", roleTextColor, "border-current/30")}>
                               <option value="">Swap</option>
-                              {alts.map((sid: string) => (
-                                <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>
-                              ))}
+                              {alts.map((sid: string) => <option key={sid} value={sid}>{STAFF_MAP[sid]?.full_name?.split(' ')[0]}</option>)}
                             </select>
                           )}
-                          </div>
                         </div>
-                        {/* Timeline - always full width */}
-                        <div className="flex-1 min-w-0">
-                            {info ? (
-                              <div className="relative">
-                                {/* Timeline bar: 8am to 12am = 16 hours */}
-                                <div className="relative h-5 rounded-full overflow-hidden" style={{backgroundColor: 'rgba(0,0,0,0.06)'}}>
-                                  {/* Rush band background */}
-                                  <div className="absolute h-full opacity-30" style={{
-                                    left: ((slot.rushStartH - 8) / 16 * 100) + '%',
-                                    width: ((slot.rushEndH - slot.rushStartH) / 16 * 100) + '%',
-                                    backgroundColor: '#FB923C'
-                                  }}/>
-                                  {/* Staff hours fill */}
-                                  <div className="absolute h-full rounded-full transition-all duration-500" style={{
-                                    left: Math.max(0, (info.startH - 8) / 16 * 100) + '%',
-                                    width: Math.min(100 - Math.max(0, (info.startH - 8) / 16 * 100), (info.totalH / 16 * 100)) + '%',
-                                    backgroundColor: member.role === 'Supervisor' ? '#3B82F6' : member.role === 'Bar' ? '#A855F7' : '#22C55E',
-                                    opacity: 0.85
-                                  }}/>
-                                  {/* Time labels positioned at fill location */}
-                                  <div className="absolute inset-y-0 flex items-center pointer-events-none" style={{
-                                    left: Math.max(0, (info.startH - 8) / 16 * 100) + '%',
-                                    width: Math.min(100 - Math.max(0, (info.startH - 8) / 16 * 100), (info.totalH / 16 * 100)) + '%',
-                                  }}>
-                                    <div className="w-full flex items-center justify-between px-1.5">
-                                      <span className="text-white font-bold drop-shadow" style={{fontSize:'9px'}}>{fmtH(info.startH)}</span>
-                                      <span className="text-white font-bold drop-shadow" style={{fontSize:'9px'}}>{fmtH(info.endH)}</span>
-                                    </div>
+                        {/* Timeline */}
+                        <div className="w-full">
+                          {info ? (
+                            <div className="relative">
+                              <div className="relative h-5 rounded-full overflow-hidden" style={{backgroundColor: 'rgba(0,0,0,0.06)'}}>
+                                <div className="absolute h-full opacity-30 rounded-full" style={{left: ((slot.rushStartH-8)/16*100)+'%', width: ((slot.rushEndH-slot.rushStartH)/16*100)+'%', backgroundColor: '#FB923C'}}/>
+                                <div className="absolute h-full rounded-full transition-all duration-500" style={{left: Math.max(0,(info.startH-8)/16*100)+'%', width: Math.min(100-Math.max(0,(info.startH-8)/16*100),(info.totalH/16*100))+'%', backgroundColor: member.role==='Supervisor'?'#3B82F6':member.role==='Bar'?'#A855F7':'#22C55E', opacity: 0.85}}/>
+                                <div className="absolute inset-y-0 flex items-center pointer-events-none" style={{left: Math.max(0,(info.startH-8)/16*100)+'%', width: Math.min(100-Math.max(0,(info.startH-8)/16*100),(info.totalH/16*100))+'%'}}>
+                                  <div className="w-full flex items-center justify-between px-1.5">
+                                    <span className="text-white font-bold drop-shadow" style={{fontSize:'9px'}}>{fmtH(info.startH)}</span>
+                                    <span className="text-white font-bold drop-shadow" style={{fontSize:'9px'}}>{fmtH(info.endH)}</span>
                                   </div>
                                 </div>
-                                {/* Hour markers - every hour 8a to 12a */}
-                                <div className="relative mt-1" style={{height:'12px'}}>
-                                  {[8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(h => (
-                                    <span key={h} className="absolute text-gray-400" style={{
-                                      left: ((h-8)/16*100)+'%',
-                                      fontSize:'8px', fontWeight:600,
-                                      transform:'translateX(-50%)',
-                                      whiteSpace:'nowrap'
-                                    }}>
-                                      {h===24?'12a':h===12?'12p':h>12?(h-12)+'p':h+'a'}
-                                    </span>
-                                  ))}
-                                </div>
                               </div>
-                            ) : (
-                              <div className="h-5 rounded-full" style={{backgroundColor: 'rgba(0,0,0,0.06)'}}/>
-                            )}
+                              <div className="relative mt-1" style={{height:'12px'}}>
+                                {[8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(h => (
+                                  <span key={h} className="absolute text-gray-400" style={{left:((h-8)/16*100)+'%',fontSize:'8px',fontWeight:600,transform:'translateX(-50%)',whiteSpace:'nowrap'}}>
+                                    {h===24?'12a':h===12?'12p':h>12?(h-12)+'p':h+'a'}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="h-5 rounded-full" style={{backgroundColor:'rgba(0,0,0,0.06)'}}/>
+                          )}
                         </div>
                       </div>
                       </>
+                    )
                     )
                   })}
                 </div>
