@@ -200,13 +200,9 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
             s.status === 'approved'
           )
 
-          return (
-            <div key={day} className={cn('bg-white rounded-3xl border shadow-sm',
-              isWeekend ? 'border-orange-200' : 'border-black/[0.06]'>
+            <div key={day} style={{backgroundColor:'#242424',borderRadius:'14px',border: isWeekend ? '1px solid rgba(255,99,87,0.2)' : '1px solid rgba(255,255,255,0.08)',overflow:'hidden'}}>
               {/* Day header */}
-              <div className={cn('px-5 py-3 flex items-center justify-between',
-                isWeekend ? 'bg-orange-50' : 'bg-[#F7F0E8]'
-              )}>
+              <div style={{padding:'12px 16px',display:'flex',alignItems:'center',justifyContent:'space-between',backgroundColor: isWeekend ? 'rgba(255,99,87,0.1)' : 'rgba(255,255,255,0.04)'}}>
                 <div className="flex items-center gap-2">
                   <p style={{color:'#F7F0E8',fontSize:'14px',fontWeight:700}}>{FULL_DAYS[dayIndex]}</p>
                   <p style={{color:'rgba(247,240,232,0.45)',fontSize:'11px'}}>{format(date, 'MMM d')}</p>
