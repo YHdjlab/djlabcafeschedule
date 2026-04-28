@@ -11,8 +11,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   return (
     <div className="min-h-screen bg-[#F7F0E8]">
       <Sidebar profile={profile}/>
-      <main className="min-h-screen hidden lg:block" style={{marginLeft: "240px"}}>
-        <div style={{padding: "36px 36px 60px 36px"}}>{children}</div>
+      <main className="min-h-screen hidden lg:block" style={{marginLeft: "240px", overflowX: "clip"}}>
+        <div style={{padding: "36px 36px 60px 36px", maxWidth: "100%", boxSizing: "border-box"}}>{children}</div>
       </main>
       <main className="min-h-screen lg:hidden">
         <div style={{padding: "72px 20px 48px"}}>{children}</div>
