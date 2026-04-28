@@ -58,8 +58,8 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
             key={t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              'flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all',
-              tab === t.id ? 'bg-[#FF6357] text-white shadow-sm' : 'bg-white text-gray-500 hover:bg-black/5'
+              'flex items-center gap-1.5 px-4 py-2 rounded-2xl text-sm font-semibold whitespace-nowrap transition-all border',
+              tab === t.id ? 'bg-[#FF6357] text-white shadow-sm border-[#FF6357]' : 'bg-white text-gray-400 hover:text-[#323232] hover:bg-black/5 border-black/5'
             )}
           >
             {t.icon}
@@ -516,13 +516,13 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
       {generatedSlots.length > 0 ? (
         <div className="space-y-8">
-          <div className="bg-white rounded-2xl border border-black/[0.06] shadow-sm p-4 flex items-center justify-between gap-4">
+          <div style={{backgroundColor:'white',borderRadius:'16px',border:'1px solid rgba(0,0,0,0.06)',boxShadow:'0 1px 3px rgba(0,0,0,0.06)',padding:'16px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}}>
             <div>
               <h3 className="font-bold text-[#323232]">Schedule Preview</h3>
               <p className="text-xs text-gray-400 mt-0.5">Auto-assigned by least hours. Use Swap dropdowns to override.</p>
             </div>
             <button onClick={saveSchedule} disabled={saving}
-              className="flex-shrink-0 flex items-center gap-2 px-6 py-2.5 rounded-2xl bg-[#FF6357] text-white text-sm font-bold hover:bg-[#e5554a] active:scale-[0.98] transition-all disabled:opacity-50 shadow-md hover:shadow-lg whitespace-nowrap">
+              style={{display:'flex',alignItems:'center',gap:'8px',padding:'10px 20px',borderRadius:'14px',backgroundColor:'#FF6357',color:'white',fontSize:'13px',fontWeight:'700',border:'none',cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,boxShadow:'0 2px 8px rgba(255,99,87,0.35)'}}>
               {saving ? 'Saving...' : 'Save and Submit'}
             </button>
           </div>
@@ -537,7 +537,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
             return (
               <div key={slot.key} className={cn('bg-white rounded-3xl shadow-sm w-full overflow-hidden', slot.issues?.length ? 'ring-2 ring-red-300' : 'ring-1 ring-black/[0.06]')}>
                 {/* Day header */}
-                <div className={cn('px-6 py-4 flex items-center justify-between gap-4', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')}>
+                <div className={cn('px-4 py-4 flex items-center justify-between gap-2', slot.issues?.length ? 'bg-red-900' : 'bg-[#323232]')} style={{minWidth:0}}>
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="min-w-0">
                       <p className="font-black text-white text-lg leading-tight">{slot.day}</p>
@@ -608,7 +608,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                           <div className="flex-1 h-px bg-gray-200"/>
                         </div>
                       )}
-                      <div key={member.id} className={cn("rounded-2xl border px-4 py-3 transition-all", roleBg, member.role === 'Available' && 'opacity-60')}>
+                      <div key={member.id} className={cn("rounded-2xl border px-3 py-3 transition-all", roleBg, member.role === 'Available' && 'opacity-60')} style={{minWidth:0}}>
                         {/* Top row */}
                         <div className="flex items-center gap-2 mb-3 flex-nowrap">
                           <div className={cn("w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0", roleColor)}>
