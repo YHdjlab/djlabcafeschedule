@@ -187,7 +187,7 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
                             </div>
                             <div className="relative mt-1" style={{height:'12px'}}>
                               {[8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24].map(h => (
-                                <span key={h} style={{position:'absolute',color:'rgba(247,240,232,0.3)',fontSize:'8px',fontWeight:600,transform:'translateX(-50%)',whiteSpace:'nowrap'}} style={{left:((h-8)/16*100)+'%',fontSize:'8px',fontWeight:600,transform:'translateX(-50%)',whiteSpace:'nowrap'}}>
+                                <span key={h} style={{position:'absolute',color:'rgba(247,240,232,0.3)',left:((h-8)/16*100)+'%',fontSize:'8px',fontWeight:600,transform:'translateX(-50%)',whiteSpace:'nowrap'}}>
                                   {h===24?'12a':h===12?'12p':h>12?(h-12)+'p':h+'a'}
                                 </span>
                               ))}

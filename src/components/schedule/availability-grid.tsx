@@ -199,6 +199,7 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
              s.floor_staff1_id === profile.id || s.floor_staff2_id === profile.id) &&
             s.status === 'approved'
           )
+          return (
 
             <div key={day} style={{backgroundColor:'#242424',borderRadius:'14px',border: isWeekend ? '1px solid rgba(255,99,87,0.2)' : '1px solid rgba(255,255,255,0.08)',overflow:'hidden'}}>
               {/* Day header */}
