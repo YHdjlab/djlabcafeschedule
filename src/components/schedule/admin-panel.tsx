@@ -62,7 +62,7 @@ export function AdminPanel({ profile, allStaff: initialStaff, rushConfig: initia
   const totalApprovals = pendingDaysOff.length + pendingSwaps.length + pendingAttendance.length
 
   return (
-    <div style={{ backgroundColor: BG, borderRadius: '20px', padding: '24px', minHeight: '600px' }}>
+    <div style={{ backgroundColor: BG, borderRadius: '0', padding: '0', minHeight: '600px' }}>
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '24px' }}>
         {TABS.map((t: any) => (
