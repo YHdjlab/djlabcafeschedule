@@ -707,7 +707,6 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                       </div>
                       </>
                     )
-                    )
                   })}
                 </div>
                 {/* Issues */}
