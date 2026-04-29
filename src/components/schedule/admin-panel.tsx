@@ -183,6 +183,9 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
   const STAFF_MAP:Record<string,any>={}
   activeStaff.forEach((s:any)=>{STAFF_MAP[s.id]=s})
   const weekAvailability=availability.filter((a:any)=>a.week_starting===weekStart&&a.available)
+  console.log('STAFF_MAP keys:', Object.keys(STAFF_MAP).length, Object.values(STAFF_MAP).map((s:any)=>s.full_name+'('+s.role+')'))
+  console.log('weekAvailability count:', weekAvailability.length)
+  console.log('availability sample:', availability.slice(0,3))
 
   const getStaffHours=(staffId:string,dateStr:string)=>{
     const hours=weekAvailability.filter((a:any)=>a.staff_id===staffId&&a.slot_date===dateStr)
