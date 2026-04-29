@@ -183,9 +183,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
   const STAFF_MAP:Record<string,any>={}
   activeStaff.forEach((s:any)=>{STAFF_MAP[s.id]=s})
   const weekAvailability=availability.filter((a:any)=>a.week_starting===weekStart&&a.available)
-  console.log('STAFF_MAP keys:', Object.keys(STAFF_MAP).length, Object.values(STAFF_MAP).map((s:any)=>s.full_name+'('+s.role+')'))
-  console.log('weekAvailability count:', weekAvailability.length)
-  console.log('availability sample:', availability.slice(0,3))
+  
 
   const getStaffHours=(staffId:string,dateStr:string)=>{
     const hours=weekAvailability.filter((a:any)=>a.staff_id===staffId&&a.slot_date===dateStr)
@@ -221,9 +219,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
         return
       }
 
-      console.log('Monday availStaff:', availStaff.map(id=>STAFF_MAP[id]?.full_name+'('+STAFF_MAP[id]?.role+')'))
-      console.log('availSups:', byLeast(availStaff.filter(id=>STAFF_MAP[id]?.role==='supervisor')).map(id=>STAFF_MAP[id]?.full_name))
-      const availSups=byLeast(availStaff.filter(id=>STAFF_MAP[id]?.role==='supervisor'))
+      const availSups=byLeast(availStaff.filter(id=>['supervisor','supervisor_floor','supervisor_bar'].includes(STAFF_MAP[id]?.role)))
       const availBars=byLeast(availStaff.filter(id=>['bar'].includes(STAFF_MAP[id]?.role)))
       const availFloors=byLeast(availStaff.filter(id=>['floor'].includes(STAFF_MAP[id]?.role)))
       const allNonSup=byLeast(availStaff.filter(id=>STAFF_MAP[id]?.role!=='supervisor'))
