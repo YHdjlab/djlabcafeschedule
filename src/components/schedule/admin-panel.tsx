@@ -311,12 +311,12 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
         if(forcePM){const hrs=avail.filter((h:number)=>h>=16&&h<24);if(hrs.length)return{startH:hrs[0],endH:hrs[hrs.length-1]+1,totalH:hrs[hrs.length-1]+1-hrs[0],hours:hrs}}
         return getStaffHours(id,dateStr,rushStartH,rushEndH)
       }
-      const bothFlexible=availSups.length>=2
-      const sup1Info=supervisor_id?getShiftForSup(supervisor_id,bothFlexible,false):null
-      const sup2Info=supervisor2_id?getShiftForSup(supervisor2_id,false,bothFlexible):null
+      // sup1 gets AM if both supervisors are present, sup2 gets PM
+      const hasTwoSups=!!(supervisor_id&&supervisor2_id)
+      const sup1Info=supervisor_id?getShiftForSup(supervisor_id,hasTwoSups,false):null
+      const sup2Info=supervisor2_id?getShiftForSup(supervisor2_id,false,hasTwoSups):null
 
-      if(day==='Monday'){console.log('MON sups:',{supervisor_id:supervisor_id?STAFF_MAP[supervisor_id]?.full_name:'none',supervisor2_id:supervisor2_id?STAFF_MAP[supervisor2_id]?.full_name:'none',availSups:availSups.map((id:string)=>STAFF_MAP[id]?.full_name),sup1Info,sup2Info})}
-      const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==supervisor2_id))
+const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==supervisor2_id))
       const bar_staff_id=barPool[0]||null
       if(bar_staff_id)assignCount[bar_staff_id]=(assignCount[bar_staff_id]||0)+8
 
