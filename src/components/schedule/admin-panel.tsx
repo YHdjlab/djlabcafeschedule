@@ -281,10 +281,10 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
         // Try to split: one AM (8-16), one PM (16-24)
         const sup0=availSups[0], sup1=availSups[1]
         const avail0=getAvail(sup0), avail1=getAvail(sup1)
-        const sup0HasAM=avail0.filter(h=>h>=8&&h<16).length>=4
-        const sup0HasPM=avail0.filter(h=>h>=16&&h<24).length>=4
-        const sup1HasAM=avail1.filter(h=>h>=8&&h<16).length>=4
-        const sup1HasPM=avail1.filter(h=>h>=16&&h<24).length>=4
+        const sup0HasAM=avail0.filter((h:number)=>h>=8&&h<16).length>=4
+        const sup0HasPM=avail0.filter((h:number)=>h>=16&&h<24).length>=4
+        const sup1HasAM=avail1.filter((h:number)=>h>=8&&h<16).length>=4
+        const sup1HasPM=avail1.filter((h:number)=>h>=16&&h<24).length>=4
 
         if(sup0HasAM&&sup1HasPM){
           // sup0 AM, sup1 PM
