@@ -14,15 +14,12 @@ export const BRAND = {
 export const ROLE_LABELS: Record<string, string> = {
   gm: 'General Manager',
   supervisor: 'Supervisor',
-  supervisor: 'Supervisor',
   floor: 'Floor Staff',
   bar: 'Bar Staff',
 }
 
 export const ROLE_COLORS: Record<string, string> = {
   gm: 'bg-purple-100 text-purple-800',
-  supervisor: 'bg-blue-100 text-blue-800',
-  supervisor: 'bg-indigo-100 text-indigo-800',
   floor: 'bg-green-100 text-green-800',
   bar: 'bg-orange-100 text-orange-800',
 }
