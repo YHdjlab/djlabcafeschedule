@@ -221,6 +221,8 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
         return
       }
 
+      console.log('Monday availStaff:', availStaff.map(id=>STAFF_MAP[id]?.full_name+'('+STAFF_MAP[id]?.role+')'))
+      console.log('availSups:', byLeast(availStaff.filter(id=>STAFF_MAP[id]?.role==='supervisor')).map(id=>STAFF_MAP[id]?.full_name))
       const availSups=byLeast(availStaff.filter(id=>STAFF_MAP[id]?.role==='supervisor'))
       const availBars=byLeast(availStaff.filter(id=>['bar'].includes(STAFF_MAP[id]?.role)))
       const availFloors=byLeast(availStaff.filter(id=>['floor'].includes(STAFF_MAP[id]?.role)))
