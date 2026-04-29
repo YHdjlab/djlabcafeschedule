@@ -155,9 +155,9 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
   const canSubmit = totalShifts > 0 && !submitted
 
   return (
-    <div className="space-y-4">
+    <div style={{display:"flex",flexDirection:"column",gap:"16px"}}>
       {/* Week nav */}
-      <div className="bg-white rounded-3xl border border-black/[0.06] shadow-sm p-4 flex items-center justify-between">
+      <div style={{backgroundColor:"#242424",borderRadius:"16px",border:"1px solid rgba(255,255,255,0.08)",padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:"12px"}}>
         <button onClick={() => { const d = new Date(weekStart+'T00:00:00'); d.setDate(d.getDate()-7); setWeekStart(format(d,'yyyy-MM-dd')); setSelections({}); setSubmitted(false) }}
           style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',color:'#F7F0E8',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
           <ChevronLeft size={16}/>
@@ -173,7 +173,7 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
       </div>
 
       {/* Shift type counter */}
-      <div className="grid grid-cols-3 gap-3">
+      <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"10px"}}>
         {SHIFTS.map(shift => (
           <div key={shift.key} style={{backgroundColor:'#242424',borderRadius:'12px',border:'1px solid rgba(255,255,255,0.08)',padding:'14px',textAlign:'center'}}>
             <p className="text-lg">{shift.icon}</p>
@@ -185,7 +185,7 @@ export function AvailabilityGrid({ profile, availability, schedules, nextMonday,
       </div>
 
       {/* Day cards */}
-      <div className="space-y-3">
+      <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
         {DAYS.map((day, dayIndex) => {
           const date = addDays(monday, dayIndex)
           const dateStr = format(date, 'yyyy-MM-dd')

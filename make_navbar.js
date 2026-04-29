@@ -1,4 +1,4 @@
-const fs = require("fs");
+ const fs = require("fs");
 
 // New top navbar layout
 fs.writeFileSync("src/app/(dashboard)/layout.tsx", `import { createClient } from "@/lib/supabase-server"

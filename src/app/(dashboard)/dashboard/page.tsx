@@ -73,16 +73,16 @@ export default async function DashboardPage() {
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 px-1">Quick Actions</p>
         <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
           {[
-            { href: '/schedule', icon: <Calendar size={20}/>, label: 'Schedule', bg: 'bg-orange-50', color: 'text-[#FF6357]' },
-            { href: '/availability', icon: <Clock size={20}/>, label: 'Availability', bg: 'bg-blue-50', color: 'text-blue-500' },
-            { href: '/swaps', icon: <ArrowLeftRight size={20}/>, label: 'Swaps', bg: 'bg-purple-50', color: 'text-purple-500' },
-            { href: '/days-off', icon: <CalendarOff size={20}/>, label: 'Days Off', bg: 'bg-green-50', color: 'text-green-500' },
-            { href: '/attendance', icon: <CheckSquare size={20}/>, label: 'Attendance', bg: 'bg-yellow-50', color: 'text-yellow-600' },
-            ...(isAdmin ? [{ href: '/admin', icon: <Settings size={20}/>, label: 'Admin', bg: 'bg-gray-100', color: 'text-gray-600' }] : []),
+            { href: '/schedule', icon: <Calendar size={20}/>, label: 'Schedule', bg: 'rgba(255,99,87,0.12)', color: '#FF6357' },
+            { href: '/availability', icon: <Clock size={20}/>, label: 'Availability', bg: 'rgba(59,130,246,0.12)', color: '#3b82f6' },
+            { href: '/swaps', icon: <ArrowLeftRight size={20}/>, label: 'Swaps', bg: 'rgba(168,85,247,0.12)', color: '#a855f7' },
+            { href: '/days-off', icon: <CalendarOff size={20}/>, label: 'Days Off', bg: 'rgba(34,197,94,0.12)', color: '#22c55e' },
+            { href: '/attendance', icon: <CheckSquare size={20}/>, label: 'Attendance', bg: 'rgba(234,179,8,0.12)', color: '#eab308' },
+            ...(isAdmin ? [{ href: '/admin', icon: <Settings size={20}/>, label: 'Admin', bg: 'rgba(255,255,255,0.08)', color: 'rgba(247,240,232,0.6)' }] : []),
           ].map(action => (
-            <Link key={action.href} href={action.href} className="group flex flex-col items-center gap-2.5 p-4 bg-white rounded-2xl hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 border border-black/5">
-              <div className={`p-3 rounded-xl ${action.bg} ${action.color} transition-transform duration-200 group-hover:scale-110`}>{action.icon}</div>
-              <span className="text-xs font-semibold text-[#323232]">{action.label}</span>
+            <Link key={action.href} href={action.href} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'10px',padding:'16px',backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',textDecoration:'none',transition:'all 0.15s'}}>
+              <div style={{padding:'10px',borderRadius:'10px',backgroundColor:action.bg,color:action.color}}>{action.icon}</div>
+              <span style={{fontSize:'12px',fontWeight:600,color:'rgba(247,240,232,0.7)'}}>{action.label}</span>
             </Link>
           ))}
         </div>
@@ -96,36 +96,36 @@ export default async function DashboardPage() {
             { label: 'Days Off', value: pendingDaysOff?.length || 0, icon: <CalendarOff size={15}/>, color: 'text-green-500', bg: 'bg-green-50' },
             { label: 'Punch-In Queue', value: pendingAttendance?.length || 0, icon: <CheckSquare size={15}/>, color: 'text-[#FF6357]', bg: 'bg-orange-50' },
           ].map(stat => (
-            <div key={stat.label} className="bg-white rounded-2xl p-4 border border-black/5">
+            <div key={stat.label} style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'16px'}}>
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-gray-400">{stat.label}</span>
+                <span style={{color:'rgba(247,240,232,0.4)',fontSize:'11px',fontWeight:500}}>{stat.label}</span>
                 <div className={`p-1.5 rounded-lg ${stat.bg} ${stat.color}`}>{stat.icon}</div>
               </div>
-              <p className="text-3xl font-bold text-[#323232]">{stat.value}</p>
+              <p style={{color:'#F7F0E8',fontSize:'28px',fontWeight:800,lineHeight:1}}>{stat.value}</p>
             </div>
           ))}
         </div>
       )}
 
       {todaySchedule && todaySchedule.length > 0 && (
-        <div className="bg-white rounded-2xl border border-black/5">
-          <div className="px-5 py-4 border-b border-black/5 flex items-center justify-between">
-            <h2 className="font-semibold text-[#323232]">Today on the floor</h2>
+        <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)'}}>
+          <div style={{padding:'14px 18px',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <h2 style={{color:'#F7F0E8',fontWeight:600}}>Today on the floor</h2>
             <Link href="/schedule" className="flex items-center gap-1 text-xs text-[#FF6357] font-medium hover:underline">Full schedule<ChevronRight size={12}/></Link>
           </div>
-          <div className="divide-y divide-black/5">
+          <div>
             {todaySchedule.map((slot: any) => {
               const mine = slot.supervisor_id === user.id || slot.bar_staff_id === user.id || slot.floor_staff1_id === user.id || slot.floor_staff2_id === user.id
               const names = [slot.supervisor, slot.bar_staff, slot.floor_staff1, slot.floor_staff2].filter(Boolean).map((s: any) => s.full_name?.split(' ')[0]).join(' · ')
               return (
-                <div key={slot.id} className={`px-5 py-4 flex items-center justify-between ${mine ? 'bg-orange-50/40' : ''}`}>
+                <div key={slot.id} style={{padding:'14px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',backgroundColor: mine ? 'rgba(255,99,87,0.06)' : 'transparent',borderBottom:'1px solid rgba(255,255,255,0.04)'}}>
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-sm font-semibold text-[#323232]">{slot.slot_label}</span>
+                      <span style={{color:'#F7F0E8',fontSize:'13px',fontWeight:600}}>{slot.slot_label}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${slot.slot_type === 'rush' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>{slot.slot_type}</span>
                       {mine && <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-[#FF6357] text-white">You</span>}
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">{names}</p>
+                    <p style={{color:'rgba(247,240,232,0.4)',fontSize:'11px',marginTop:'4px'}}>{names}</p>
                   </div>
                   <ChevronRight size={14} className="text-gray-300 flex-shrink-0"/>
                 </div>
@@ -138,7 +138,7 @@ export default async function DashboardPage() {
       {isAdmin && totalPending > 0 && (
         <div className="bg-white rounded-2xl border border-black/5">
           <div className="px-5 py-4 border-b border-black/5 flex items-center justify-between">
-            <h2 className="font-semibold text-[#323232]">Needs your attention</h2>
+            <h2 style={{color:'#F7F0E8',fontWeight:600}}>Needs your attention</h2>
             <Link href="/admin" className="flex items-center gap-1 text-xs text-[#FF6357] font-medium hover:underline">Manage all<ChevronRight size={12}/></Link>
           </div>
           <div className="divide-y divide-black/5">
@@ -146,8 +146,8 @@ export default async function DashboardPage() {
               <div key={rec.id} className="px-5 py-3.5 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0"><CheckSquare size={15} className="text-yellow-600"/></div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#323232] truncate">{rec.staff?.full_name} checked in</p>
-                  <p className="text-xs text-gray-400">at {rec.checkin_time} · {rec.shift_type}</p>
+                  <p style={{color:'#F7F0E8',fontSize:'13px',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{rec.staff?.full_name} checked in</p>
+                  <p style={{color:'rgba(247,240,232,0.4)',fontSize:'11px'}}>at {rec.checkin_time} · {rec.shift_type}</p>
                 </div>
                 <span className="text-xs px-2.5 py-1 rounded-full bg-yellow-100 text-yellow-700 font-semibold flex-shrink-0">Approve</span>
               </div>
@@ -156,8 +156,8 @@ export default async function DashboardPage() {
               <div key={swap.id} className="px-5 py-3.5 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0"><ArrowLeftRight size={15} className="text-purple-600"/></div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#323232] truncate">{swap.staff_a?.full_name} + {swap.staff_b?.full_name}</p>
-                  <p className="text-xs text-gray-400">Swap request · {swap.shift_date}</p>
+                  <p style={{color:'#F7F0E8',fontSize:'13px',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{swap.staff_a?.full_name} + {swap.staff_b?.full_name}</p>
+                  <p style={{color:'rgba(247,240,232,0.4)',fontSize:'11px'}}>Swap request · {swap.shift_date}</p>
                 </div>
                 <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 font-semibold flex-shrink-0">Review</span>
               </div>
@@ -166,8 +166,8 @@ export default async function DashboardPage() {
               <div key={req.id} className="px-5 py-3.5 flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0"><CalendarOff size={15} className="text-green-600"/></div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#323232] truncate">{req.staff?.full_name}</p>
-                  <p className="text-xs text-gray-400">Day off · {req.date_off}</p>
+                  <p style={{color:'#F7F0E8',fontSize:'13px',fontWeight:500,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{req.staff?.full_name}</p>
+                  <p style={{color:'rgba(247,240,232,0.4)',fontSize:'11px'}}>Day off · {req.date_off}</p>
                 </div>
                 <span className="text-xs px-2.5 py-1 rounded-full bg-green-100 text-green-700 font-semibold flex-shrink-0">Review</span>
               </div>
@@ -177,12 +177,12 @@ export default async function DashboardPage() {
       )}
 
       {!isAdmin && (!todaySchedule || todaySchedule.length === 0) && (
-        <div className="bg-white rounded-2xl border border-black/5 p-10 text-center">
-          <div className="w-14 h-14 bg-[#F7F0E8] rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'40px',textAlign:'center'}}>
+          <div style={{width:'56px',height:'56px',backgroundColor:'rgba(255,255,255,0.06)',borderRadius:'14px',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
             <Calendar size={24} className="text-[#FF6357]"/>
           </div>
-          <p className="font-semibold text-[#323232]">No shifts today</p>
-          <p className="text-sm text-gray-400 mt-1 mb-4">Check your schedule for upcoming shifts</p>
+          <p style={{color:'#F7F0E8',fontWeight:600}}>No shifts today</p>
+          <p style={{color:'rgba(247,240,232,0.4)',fontSize:'13px',margin:'6px 0 16px'}}>Check your schedule for upcoming shifts</p>
           <Link href="/schedule" className="inline-flex items-center gap-1 text-sm text-[#FF6357] font-semibold hover:underline">View schedule<ChevronRight size={14}/></Link>
         </div>
       )}

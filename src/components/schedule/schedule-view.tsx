@@ -79,17 +79,17 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
   return (
     <div className="space-y-4">
       {/* Week navigator */}
-      <div className="bg-white rounded-3xl border border-black/[0.06] shadow-sm p-4 flex items-center justify-between">
+      <div style={{backgroundColor:"#242424",borderRadius:"16px",border:"1px solid rgba(255,255,255,0.08)",padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:"12px"}}>
         <button onClick={() => setCurrentWeek(w => subWeeks(w, 1))}
-          className="w-10 h-10 rounded-2xl bg-[#F7F0E8] hover:bg-black/10 flex items-center justify-center transition-colors">
+          style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',color:'#F7F0E8',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
           <ChevronLeft size={18}/>
         </button>
         <div className="text-center">
           <p className="font-bold text-[#323232]">{format(currentWeek, 'MMM d')} — {format(addDays(currentWeek, 6), 'MMM d, yyyy')}</p>
-          <p className="text-xs text-gray-400 mt-0.5">{weekSlots.length} shifts this week</p>
+          <p style={{color:'rgba(247,240,232,0.45)',fontSize:'12px',marginTop:'2px'}}>{weekSlots.length} shifts this week</p>
         </div>
         <button onClick={() => setCurrentWeek(w => addWeeks(w, 1))}
-          className="w-10 h-10 rounded-2xl bg-[#F7F0E8] hover:bg-black/10 flex items-center justify-center transition-colors">
+          style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.08)',color:'#F7F0E8',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
           <ChevronRight size={18}/>
         </button>
       </div>
@@ -135,14 +135,14 @@ export function ScheduleView({ schedules, profile, isAdmin, availability }: Sche
                 <>
                   {/* Rush band */}
                   <div style={{padding:'8px 20px',backgroundColor:'#1e1e1e',borderBottom:'1px solid rgba(255,255,255,0.06)',display:'flex',alignItems:'center',gap:'12px'}}>
-                    <div className="flex-1 h-2 rounded-full bg-gray-100 relative overflow-hidden">
+                    <div style={{flex:1,height:"6px",borderRadius:"20px",backgroundColor:"rgba(255,255,255,0.06)",position:"relative",overflow:"hidden"}}>
                       <div className="absolute h-full bg-blue-200 rounded-full" style={{left: '0%', width: ((15-8)/16*100)+'%'}}/>
                       <div className="absolute h-full bg-orange-300 rounded-full" style={{left: ((15-8)/16*100)+'%', width: ((21-15)/16*100)+'%'}}/>
                       <div className="absolute h-full bg-blue-200 rounded-full" style={{left: ((21-8)/16*100)+'%', width: ((24-21)/16*100)+'%'}}/>
                     </div>
-                    <div className="flex gap-3 text-xs whitespace-nowrap">
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-200 inline-block"/>Off-rush</span>
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-300 inline-block"/>Rush 3pm-9pm</span>
+                    <div style={{display:"flex",gap:"12px",fontSize:"11px",whiteSpace:"nowrap",flexShrink:0}}>
+                      <span style={{display:"flex",alignItems:"center",gap:"4px",color:"rgba(247,240,232,0.45)"}}><span style={{width:"6px",height:"6px",borderRadius:"50%",backgroundColor:"rgba(96,165,250,0.5)",display:"inline-block"}}/>Off-rush</span>
+                      <span style={{display:"flex",alignItems:"center",gap:"4px",color:"rgba(247,240,232,0.45)"}}><span style={{width:"6px",height:"6px",borderRadius:"50%",backgroundColor:"rgba(251,146,60,0.6)",display:"inline-block"}}/>Rush 3pm-9pm</span>
                     </div>
                   </div>
 

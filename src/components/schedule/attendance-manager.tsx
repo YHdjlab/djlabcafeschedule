@@ -99,15 +99,15 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)'}}>
                 <div>
                   <p className="text-xs text-gray-500">Check-in time</p>
-                  <p className="font-semibold text-[#323232]">{todayRecord.checkin_time}</p>
+                  <p style={{color:'#F7F0E8',fontWeight:600}}>{todayRecord.checkin_time}</p>
                 </div>
                 <Badge variant={STATUS_COLORS[todayRecord.status]}>{todayRecord.status.replace('_',' ')}</Badge>
               </div>
 
               {todayRecord.checkout_time ? (
-                <div className="p-3 rounded-xl bg-green-50">
-                  <p className="text-xs text-gray-500">Checked out at</p>
-                  <p className="font-semibold text-green-700">{todayRecord.checkout_time}</p>
+                <div style={{padding:'12px',borderRadius:'10px',backgroundColor:'rgba(34,197,94,0.1)'}}>
+                  <p style={{color:'rgba(247,240,232,0.4)',fontSize:'11px'}}>Checked out at</p>
+                  <p style={{color:'#22c55e',fontWeight:600}}>{todayRecord.checkout_time}</p>
                 </div>
               ) : todayRecord.status === 'checked_in' ? (
                 <Button onClick={checkOut} loading={loading} variant="secondary" size="lg" className="w-full">
@@ -115,7 +115,7 @@ export function AttendanceManager({ profile, todayRecord: initial, recentAttenda
                   Check Out
                 </Button>
               ) : (
-                <p className="text-sm text-center text-gray-400">Awaiting supervisor approval</p>
+                <p style={{color:'rgba(247,240,232,0.4)',fontSize:'13px',textAlign:'center'}}>Awaiting supervisor approval</p>
               )}
             </div>
           )}

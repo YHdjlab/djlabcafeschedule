@@ -1,27 +1,19 @@
 import { cn } from '@/lib/utils'
 
-interface BadgeProps {
-  children: React.ReactNode
-  variant?: 'default' | 'coral' | 'green' | 'yellow' | 'red' | 'blue' | 'purple'
-  className?: string
+const variants: Record<string, React.CSSProperties> = {
+  default: { backgroundColor: 'rgba(255,255,255,0.08)', color: 'rgba(247,240,232,0.6)' },
+  green:   { backgroundColor: 'rgba(34,197,94,0.15)', color: '#22c55e' },
+  yellow:  { backgroundColor: 'rgba(234,179,8,0.15)', color: '#eab308' },
+  red:     { backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' },
+  blue:    { backgroundColor: 'rgba(59,130,246,0.15)', color: '#3b82f6' },
+  purple:  { backgroundColor: 'rgba(168,85,247,0.15)', color: '#a855f7' },
+  coral:   { backgroundColor: 'rgba(255,99,87,0.15)', color: '#FF6357' },
 }
 
-const variants = {
-  default:  'bg-gray-100 text-gray-600 border border-gray-200/80',
-  coral:    'bg-[#FF6357]/10 text-[#FF6357] border border-[#FF6357]/20',
-  green:    'bg-green-50 text-green-700 border border-green-200/80',
-  yellow:   'bg-amber-50 text-amber-700 border border-amber-200/80',
-  red:      'bg-red-50 text-red-600 border border-red-200/80',
-  blue:     'bg-blue-50 text-blue-600 border border-blue-200/80',
-  purple:   'bg-purple-50 text-purple-600 border border-purple-200/80',
-}
-
-export function Badge({ children, variant = 'default', className }: BadgeProps) {
+export function Badge({ children, variant = 'default', className }: { children: React.ReactNode; variant?: string; className?: string }) {
   return (
-    <span className={cn(
-      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold tracking-wide',
-      variants[variant], className
-    )}>
+    <span style={{...variants[variant] || variants.default, fontSize:'11px', fontWeight:700, padding:'3px 10px', borderRadius:'20px', whiteSpace:'nowrap' as const}}
+      className={className}>
       {children}
     </span>
   )

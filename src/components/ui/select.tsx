@@ -1,37 +1,19 @@
-'use client'
 import { cn } from '@/lib/utils'
 import { SelectHTMLAttributes, forwardRef } from 'react'
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string
-  error?: string
-  options: { value: string; label: string }[]
+  label?: string; error?: string; options?: {value:string;label:string}[]
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ className, label, error, options, ...props }, ref) => {
-    return (
-      <div className="flex flex-col gap-1.5">
-        {label && <label className="text-sm font-semibold text-[#323232]">{label}</label>}
-        <select
-          ref={ref}
-          className={cn(
-            'w-full px-4 py-3 rounded-2xl border bg-white text-[#323232] text-sm',
-            'border-black/10 shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
-            'focus:outline-none focus:ring-2 focus:ring-[#FF6357]/25 focus:border-[#FF6357]/60',
-            'transition-all duration-150 cursor-pointer',
-            error && 'border-red-400',
-            className
-          )}
-          {...props}
-        >
-          {options.map(opt => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
-        {error && <p className="text-xs text-red-500 font-medium">{error}</p>}
-      </div>
-    )
-  }
+  ({ className, label, error, options, children, ...props }, ref) => (
+    <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
+      {label && <label style={{color:'rgba(247,240,232,0.5)',fontSize:'11px',fontWeight:600,textTransform:'uppercase',letterSpacing:'0.06em'}}>{label}</label>}
+      <select ref={ref} style={{width:'100%',padding:'10px 14px',borderRadius:'10px',border:error?'1px solid #ef4444':'1px solid rgba(255,255,255,0.1)',backgroundColor:'#2e2e2e',color:'#F7F0E8',fontSize:'14px',cursor:'pointer'}} className={className} {...props}>
+        {options ? options.map(o => <option key={o.value} value={o.value}>{o.label}</option>) : children}
+      </select>
+      {error && <p style={{color:'#ef4444',fontSize:'12px'}}>{error}</p>}
+    </div>
+  )
 )
 Select.displayName = 'Select'

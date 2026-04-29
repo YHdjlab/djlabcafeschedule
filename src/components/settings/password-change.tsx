@@ -77,15 +77,15 @@ export function PasswordChange({ profile }: { profile: any }) {
             required
           />
           {error && (
-            <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl">
+            <div style={{display:'flex',alignItems:'center',gap:'8px',padding:'12px',backgroundColor:'rgba(239,68,68,0.1)',borderRadius:'10px',border:'1px solid rgba(239,68,68,0.2)'}}>
               <AlertCircle size={14} className="text-red-500 flex-shrink-0"/>
-              <p className="text-sm text-red-500">{error}</p>
+              <p style={{color:'#ef4444',fontSize:'13px'}}>{error}</p>
             </div>
           )}
           {success && (
-            <div className="flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-100 rounded-2xl">
+            <div style={{display:'flex',alignItems:'center',gap:'8px',padding:'12px',backgroundColor:'rgba(34,197,94,0.1)',borderRadius:'10px',border:'1px solid rgba(34,197,94,0.2)'}}>
               <Check size={14} className="text-green-500 flex-shrink-0"/>
-              <p className="text-sm text-green-600 font-medium">Password changed successfully!</p>
+              <p style={{color:'#22c55e',fontSize:'13px',fontWeight:500}}>Password changed successfully!</p>
             </div>
           )}
           <Button type="submit" loading={loading} className="w-full" size="lg">

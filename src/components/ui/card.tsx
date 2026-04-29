@@ -1,14 +1,14 @@
 import { cn } from '@/lib/utils'
 
 export function Card({ children, className, padding = 'md' }: { children: React.ReactNode; className?: string; padding?: 'none'|'sm'|'md'|'lg' }) {
-  const p = { none: '', sm: 'p-5', md: 'p-6', lg: 'p-8' }[padding]
-  return <div className={cn('bg-white rounded-3xl border border-black/[0.06] shadow-sm', p, className)}>{children}</div>
+  const p = { none: '', sm: 'p-4', md: 'p-5', lg: 'p-6' }[padding]
+  return <div style={{backgroundColor:'#242424',borderRadius:'16px',border:'1px solid rgba(255,255,255,0.08)'}} className={cn(p, className)}>{children}</div>
 }
 
 export function CardHeader({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={cn('flex items-center justify-between mb-5', className)}>{children}</div>
+  return <div className={cn('flex items-center justify-between mb-4', className)}>{children}</div>
 }
 
 export function CardTitle({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <h3 className={cn('text-base font-bold text-[#323232]', className)}>{children}</h3>
+  return <h3 style={{color:'#F7F0E8',fontSize:'15px',fontWeight:700}} className={className}>{children}</h3>
 }
