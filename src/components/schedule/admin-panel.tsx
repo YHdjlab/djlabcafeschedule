@@ -270,18 +270,26 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
       const supervisor_id=availSups[0]||null
       if(supervisor_id)assignCount[supervisor_id]=(assignCount[supervisor_id]||0)+8
 
-      // Assign secondary supervisor if first doesn't cover full day
-      // e.g. Miled 8-16, JP 16-24
+      // Always try to assign a second supervisor for full-day coverage
+      // sup1 does AM/MID, sup2 does the remaining window
       const sup1Shift=supervisor_id?getShift(supervisor_id):null
-      const needsSecondSup=!sup1Shift||(sup1Shift.startH>8&&sup1Shift.endH<23)
-      const supervisor2_id=needsSecondSup?availSups.find((id:string)=>{
-        if(id===supervisor_id)return false
-        const sh=getShift(id)
-        if(!sh)return false
-        // Check if this supervisor covers hours not covered by first
-        if(!sup1Shift)return true
-        return sh.startH<sup1Shift.startH||sh.endH>sup1Shift.endH
-      })||null:null
+      const supervisor2_id=availSups.length>1?(()=>{
+        // Find sup that covers different hours than sup1
+        for(const id of availSups){
+          if(id===supervisor_id)continue
+          const sh=getShift(id)
+          if(!sh)continue
+          // Prefer someone whose shift doesn't fully overlap with sup1
+          if(!sup1Shift)return id
+          const overlapH=Math.max(0,Math.min(sup1Shift.endH,sh.endH)-Math.max(sup1Shift.startH,sh.startH))
+          if(overlapH<4)return id // less than 4h overlap = good split
+        }
+        // If no good split found, still assign second sup for redundancy on weekends
+        if(isWeekend&&availSups.length>1){
+          return availSups.find((id:string)=>id!==supervisor_id)||null
+        }
+        return null
+      })():null
       if(supervisor2_id)assignCount[supervisor2_id]=(assignCount[supervisor2_id]||0)+8
 
       const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==supervisor2_id))
@@ -466,7 +474,12 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
                                 const ar=e.target.value
                                 const fm:Record<string,string>={Supervisor:'supervisor_id',Bar:'bar_staff_id',Floor1:'floor_staff1_id',Floor2:'floor_staff2_id'}
                                 const fld=fm[ar];if(!fld)return
-                                setGeneratedSlots(prev=>prev.map(gs=>gs.key!==slot.key?gs:{...gs,[fld]:member.id,staff:gs.staff.map((m:any)=>m.id===member.id?{...m,role:ar==='Floor1'||ar==='Floor2'?'Floor':ar}:m)}))
+                                setGeneratedSlots((prev:any[])=>prev.map((gs:any)=>{
+                                  if(gs.key!==slot.key)return gs
+                                  const newRole=ar==='Floor1'||ar==='Floor2'?'Floor':ar
+                                  const newStaff=gs.staff.map((m:any)=>m.id===member.id?{...m,role:newRole,info:getStaffHours(m.id,gs.date,gs.rushStartH,gs.rushEndH)}:m)
+                                  return{...gs,[fld]:member.id,staff:newStaff}
+                                }))
                               }} style={{backgroundColor:CORAL+'20',color:CORAL,border:`1px solid ${CORAL}40`,borderRadius:'8px',padding:'4px 8px',fontSize:'11px',fontWeight:700,cursor:'pointer'}}>
                                 <option value="">+ Assign</option>
                                 {!slot.supervisor_id&&s.role==='supervisor'&&<option value="Supervisor">As Supervisor</option>}
