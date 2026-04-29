@@ -112,7 +112,7 @@ export function AvailabilityGrid({profile,availability,schedules,nextMonday,curr
                   return(
                     <div key={h} style={{position:'relative'}}>
                       <button onClick={()=>toggleHour(dayIndex,h)} title={fmtH(h)+(isBlocked?' — blocked':' — available')} style={{width:'100%',height:'30px',borderRadius:'3px',border:'none',cursor:'pointer',backgroundColor:isBlocked?'rgba(239,68,68,0.35)':isRush?'rgba(249,115,22,0.12)':'rgba(255,255,255,0.04)',borderTop:isBlocked?'2px solid rgba(239,68,68,0.6)':isRush?'2px solid rgba(249,115,22,0.3)':'2px solid rgba(255,255,255,0.06)',transition:'all 0.1s'}}/>
-                      {h%2===0&&<span style={{position:'absolute',bottom:'-13px',left:'50%',transform:'translateX(-50%)',color:'rgba(247,240,232,0.25)',fontSize:'8px',fontWeight:600,whiteSpace:'nowrap',pointerEvents:'none'}}>{fmtH(h)}</span>}
+                      <span style={{position:'absolute',bottom:'-13px',left:'50%',transform:'translateX(-50%)',color:'rgba(247,240,232,0.25)',fontSize:'7px',fontWeight:600,whiteSpace:'nowrap',pointerEvents:'none'}}>{fmtH(h)}</span>
                     </div>
                   )
                 })}
