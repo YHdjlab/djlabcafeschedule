@@ -32,7 +32,7 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
   const [error, setError] = useState('')
   const supabase = createClient()
 
-  const isAdmin = ['gm', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
+  const isAdmin = ['gm', 'supervisor'].includes(profile.role)
 
   const staffOptions = staff
     .filter(s => s.id !== profile.id)
@@ -46,8 +46,8 @@ export function SwapManager({ profile, swapRequests: initial, staff, schedules }
     const staffB = staff.find(s => s.id === form.staffBId)
     const myRole = profile.role
     const theirRole = staffB?.role
-    const floorRoles = ['floor', 'supervisor_floor']
-    const barRoles = ['bar', 'supervisor_bar']
+    const floorRoles = ['floor', 'supervisor']
+    const barRoles = ['bar', 'supervisor']
     const myGroup = floorRoles.includes(myRole) ? 'floor' : 'bar'
     const theirGroup = floorRoles.includes(theirRole) ? 'floor' : 'bar'
 

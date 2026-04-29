@@ -1,4 +1,4 @@
-export type Role = 'gm' | 'supervisor_floor' | 'supervisor_bar' | 'floor' | 'bar'
+export type Role = 'gm' | 'supervisor' | 'supervisor' | 'floor' | 'bar'
 
 export interface Profile {
   id: string

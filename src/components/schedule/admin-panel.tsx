@@ -40,8 +40,8 @@ const TABS = [
 const ROLE_OPTIONS = [
   { value: 'floor', label: 'Floor Staff' },
   { value: 'bar', label: 'Bar Staff' },
-  { value: 'supervisor_floor', label: 'Supervisor (Floor)' },
-  { value: 'supervisor_bar', label: 'Supervisor (Bar)' },
+  { value: 'supervisor', label: 'Supervisor' },
+  { value: 'supervisor', label: 'Supervisor' },
   { value: 'gm', label: 'General Manager' },
 ]
 
@@ -163,7 +163,7 @@ function OverviewTab({ staff, pendingDaysOff, pendingSwaps, pendingAttendance, s
 
 function StaffTab({ staff, setStaff, profile, supabase }: any) {
   const [editId, setEditId] = useState<string|null>(null)
-  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role)
+  const isGM = ['gm','admin','supervisor'].includes(profile.role)
 
   const toggleActive = async (id: string, current: boolean) => {
     const { data } = await supabase.from('profiles').update({ active: !current, terminated_at: !current ? null : new Date().toISOString() }).eq('id', id).select().single()
@@ -230,7 +230,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
   const [generating, setGenerating] = useState(false)
   const [saving, setSaving] = useState(false)
   const [generatedSlots, setGeneratedSlots] = useState<any[]>([])
-  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role)
+  const isGM = ['gm','admin','supervisor'].includes(profile.role)
   const activeStaff = staff.filter((s: any) => s.active && s.role !== 'gm')
   const STAFF_MAP = Object.fromEntries(activeStaff.map((s: any) => [s.id, s]))
   const weekAvailability = availability.filter((a: any) => a.week_starting === weekStart && a.available)
@@ -250,7 +250,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
     const weekdayConfig = rushConfig?.find((r: any) => r.day_type === 'weekday')
     const rushStartH = parseInt((weekdayConfig?.rush_start || '15:00').split(':')[0])
     const rushEndH = parseInt((weekdayConfig?.rush_end || '21:00').split(':')[0])
-    const supRoles = ['supervisor_floor','supervisor_bar','admin']
+    const supRoles = ['supervisor']
     const assignCount: Record<string,number> = {}
     activeStaff.forEach((s: any) => { assignCount[s.id] = 0 })
     const byLeast = (ids: string[]) => [...ids].sort((a: string, b: string) => (assignCount[a]||0) - (assignCount[b]||0))
@@ -271,8 +271,8 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
       }
 
       const availSups = byLeast(availStaff.filter((id: string) => supRoles.includes(STAFF_MAP[id]?.role)))
-      const availBars = byLeast(availStaff.filter((id: string) => ['bar','supervisor_bar'].includes(STAFF_MAP[id]?.role)))
-      const availFloors = byLeast(availStaff.filter((id: string) => ['floor','supervisor_floor','admin'].includes(STAFF_MAP[id]?.role)))
+      const availBars = byLeast(availStaff.filter((id: string) => ['bar','supervisor'].includes(STAFF_MAP[id]?.role)))
+      const availFloors = byLeast(availStaff.filter((id: string) => ['floor','supervisor','admin'].includes(STAFF_MAP[id]?.role)))
 
       const supervisor_id = availSups[0] || null
       if (supervisor_id) assignCount[supervisor_id] = (assignCount[supervisor_id]||0) + 8
@@ -455,7 +455,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                     const roleColors: Record<string,string> = { Supervisor: '#3B82F6', Bar: '#A855F7', Floor: '#22C55E', Available: '#636366' }
                     const rc = roleColors[member.role] || '#636366'
                     const fieldName: string = member.role === 'Supervisor' ? 'supervisor_id' : member.role === 'Bar' ? 'bar_staff_id' : member.role === 'Available' ? '__bench__' : member.id === slot.floor_staff1_id ? 'floor_staff1_id' : 'floor_staff2_id'
-                    const eligibleRoles = ['floor','bar','supervisor_floor','supervisor_bar','admin']
+                    const eligibleRoles = ['floor','bar','supervisor']
                     const slotAvailIds = (() => { const set = new Set<string>(); weekAvailability.filter((a: any) => a.slot_date === slot.date).forEach((a: any) => set.add(a.staff_id)); return Array.from(set) })()
                     const alts = member.role === 'Available' ? [] : slotAvailIds.filter((sid: string) => {
                       if (sid === member.id) return false
@@ -504,7 +504,7 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
                                 setGeneratedSlots(prev => prev.map(gs => gs.key !== slot.key ? gs : { ...gs, [fld]: member.id, staff: gs.staff.map((m: any) => m.id === member.id ? { ...m, role: ar === 'Floor1' || ar === 'Floor2' ? 'Floor' : ar } : m) }))
                               }} style={{ backgroundColor: CORAL + '20', color: CORAL, border: `1px solid ${CORAL}40`, borderRadius: '8px', padding: '4px 8px', fontSize: '11px', fontWeight: 700, cursor: 'pointer' }}>
                                 <option value="">+ Assign</option>
-                                {!slot.supervisor_id && ['supervisor_floor','supervisor_bar','admin'].includes(STAFF_MAP[member.id]?.role) && <option value="Supervisor">As Supervisor</option>}
+                                {!slot.supervisor_id && ['supervisor'].includes(STAFF_MAP[member.id]?.role) && <option value="Supervisor">As Supervisor</option>}
                                 {!slot.bar_staff_id && <option value="Bar">As Bar</option>}
                                 {!slot.floor_staff1_id && <option value="Floor1">As Floor</option>}
                                 {slot.floor_staff1_id && !slot.floor_staff2_id && <option value="Floor2">As 2nd Floor</option>}
@@ -589,11 +589,11 @@ function ScheduleBuilderTab({ staff, schedules, setSchedules, profile, supabase,
 
 function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPendingSwaps, pendingAttendance, setPendingAttendance, profile, supabase }: any) {
   const [loading, setLoading] = useState<string|null>(null)
-  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role)
+  const isGM = ['gm','admin','supervisor'].includes(profile.role)
 
   const approveDayOff = async (id: string, action: 'approve'|'deny') => {
     setLoading(id+action)
-    const isSupervisor = ['supervisor_floor','supervisor_bar'].includes(profile.role)
+    const isSupervisor = ['supervisor'].includes(profile.role)
     const newStatus = action === 'approve' ? (isSupervisor ? 'pending_gm' : 'approved') : 'denied'
     const update: any = { status: newStatus }
     if (action === 'approve') { if (isSupervisor) update.supervisor_approved_at = new Date().toISOString(); else update.gm_approved_at = new Date().toISOString() }
@@ -686,7 +686,7 @@ function ApprovalsTab({ pendingDaysOff, setPendingDaysOff, pendingSwaps, setPend
 function SettingsTab({ rushConfig, setRushConfig, profile, supabase }: any) {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const isGM = ['gm','admin','supervisor_floor','supervisor_bar'].includes(profile.role)
+  const isGM = ['gm','admin','supervisor'].includes(profile.role)
   const weekday = rushConfig.find((r: any) => r.day_type === 'weekday') || { rush_start: '15:00', rush_end: '21:00' }
   const weekend = rushConfig.find((r: any) => r.day_type === 'weekend') || { rush_start: '08:00', rush_end: '00:00' }
   const [wdStart, setWdStart] = useState(weekday.rush_start)

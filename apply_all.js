@@ -1,4 +1,66 @@
-'use client'
+﻿const fs = require("fs");
+const https = require("https");
+
+async function runSQL(sql) {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify({ query: sql });
+    const options = {
+      hostname: "api.supabase.com",
+      path: "/v1/projects/gxmdtemgiuvahlcaobrr/database/query",
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer sbp_b091296166042eb5bc4e7fada7bfb81737dd8970", "Content-Length": Buffer.byteLength(data) }
+    };
+    const req = https.request(options, res => { let b=""; res.on("data",d=>b+=d); res.on("end",()=>resolve({status:res.statusCode,body:b})); });
+    req.on("error", reject); req.write(data); req.end();
+  });
+}
+
+async function main() {
+  // Fix roles in DB
+  let r = await runSQL("ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_role_check");
+  console.log("drop constraint:", r.status);
+  r = await runSQL("ALTER TABLE profiles ADD CONSTRAINT profiles_role_check CHECK (role IN ('gm','admin','supervisor','floor','bar'))");
+  console.log("add constraint:", r.status);
+  r = await runSQL("UPDATE profiles SET role='supervisor' WHERE role IN ('supervisor_floor','supervisor_bar','admin')");
+  console.log("update roles:", r.body);
+  r = await runSQL("SELECT email,role FROM profiles ORDER BY role");
+  console.log("verify:", r.body);
+
+  // Fix all role checks in code
+  const files = [];
+  function walk(dir) {
+    fs.readdirSync(dir).forEach(f => {
+      const p = dir+"/"+f;
+      if (fs.statSync(p).isDirectory()) walk(p);
+      else if (p.endsWith(".tsx")||p.endsWith(".ts")) files.push(p);
+    });
+  }
+  walk("src");
+  const replacements = [
+    ["supervisor_floor','supervisor_bar','admin", "supervisor"],
+    ["supervisor_floor', 'supervisor_bar', 'admin", "supervisor"],
+    ["supervisor_floor','supervisor_bar", "supervisor"],
+    ["supervisor_floor', 'supervisor_bar", "supervisor"],
+    ["'gm', 'admin', 'supervisor_floor', 'supervisor_bar'", "'gm', 'admin', 'supervisor'"],
+    ["'gm','admin','supervisor_floor','supervisor_bar'", "'gm','admin','supervisor'"],
+    ["supervisor_floor", "supervisor"],
+    ["supervisor_bar", "supervisor"],
+    ["Supervisor (Floor)", "Supervisor"],
+    ["Supervisor (Bar)", "Supervisor"],
+  ];
+  let fixed = 0;
+  files.forEach(file => {
+    let c = fs.readFileSync(file, "utf8");
+    let changed = false;
+    replacements.forEach(([from, to]) => {
+      if (c.includes(from)) { c = c.split(from).join(to); changed = true; }
+    });
+    if (changed) { fs.writeFileSync(file, c, "utf8"); console.log("fixed:", file); fixed++; }
+  });
+  console.log("Total files fixed:", fixed);
+
+  // Write new availability grid
+  const grid = `'use client'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase-client'
 import { format, addDays } from 'date-fns'
@@ -25,7 +87,7 @@ export function AvailabilityGrid({profile,availability,schedules,nextMonday,curr
     const map:Record<string,boolean>={}
     availability.forEach((a:any)=>{
       if(a.week_starting===weekStart&&!a.available){
-        const match=a.slot_key?.match(/_h(d+)$/)
+        const match=a.slot_key?.match(/_h(\d+)$/)
         if(match){
           const mon=new Date(weekStart+'T00:00:00')
           for(let d=0;d<7;d++){
@@ -68,16 +130,16 @@ export function AvailabilityGrid({profile,availability,schedules,nextMonday,curr
 
   return(
     <div style={{display:'flex',flexDirection:'column',gap:'16px'}}>
-      <div style={{backgroundColor:CARD,borderRadius:'16px',border:`1px solid ${BORDER}`,padding:'14px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px'}}>
-        <button onClick={()=>{const d=new Date(weekStart+'T00:00:00');d.setDate(d.getDate()-7);setWeekStart(format(d,'yyyy-MM-dd'));setBlocked({});setSubmitted(false)}} style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:`1px solid ${BORDER}`,color:CREAM,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><ChevronLeft size={16}/></button>
+      <div style={{backgroundColor:CARD,borderRadius:'16px',border:\`1px solid \${BORDER}\`,padding:'14px 18px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'12px'}}>
+        <button onClick={()=>{const d=new Date(weekStart+'T00:00:00');d.setDate(d.getDate()-7);setWeekStart(format(d,'yyyy-MM-dd'));setBlocked({});setSubmitted(false)}} style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:\`1px solid \${BORDER}\`,color:CREAM,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><ChevronLeft size={16}/></button>
         <div style={{textAlign:'center'}}>
           <p style={{color:CREAM,fontSize:'14px',fontWeight:700}}>{format(monday,'MMM d')} – {format(addDays(monday,6),'MMM d, yyyy')}</p>
           <p style={{color:MUTED,fontSize:'12px',marginTop:'2px'}}>{blockedCount>0?blockedCount+' hours blocked':'All hours available'}</p>
         </div>
-        <button onClick={()=>{const d=new Date(weekStart+'T00:00:00');d.setDate(d.getDate()+7);setWeekStart(format(d,'yyyy-MM-dd'));setBlocked({});setSubmitted(false)}} style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:`1px solid ${BORDER}`,color:CREAM,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><ChevronRight size={16}/></button>
+        <button onClick={()=>{const d=new Date(weekStart+'T00:00:00');d.setDate(d.getDate()+7);setWeekStart(format(d,'yyyy-MM-dd'));setBlocked({});setSubmitted(false)}} style={{width:'36px',height:'36px',borderRadius:'10px',backgroundColor:'rgba(255,255,255,0.06)',border:\`1px solid \${BORDER}\`,color:CREAM,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><ChevronRight size={16}/></button>
       </div>
 
-      <div style={{backgroundColor:CARD,borderRadius:'14px',border:`1px solid ${BORDER}`,padding:'12px 16px',display:'flex',alignItems:'center',gap:'16px',flexWrap:'wrap'}}>
+      <div style={{backgroundColor:CARD,borderRadius:'14px',border:\`1px solid \${BORDER}\`,padding:'12px 16px',display:'flex',alignItems:'center',gap:'16px',flexWrap:'wrap'}}>
         <div style={{display:'flex',alignItems:'center',gap:'6px'}}><div style={{width:'24px',height:'14px',borderRadius:'3px',backgroundColor:'rgba(239,68,68,0.35)',border:'2px solid rgba(239,68,68,0.6)'}}/><span style={{color:MUTED,fontSize:'12px'}}>Blocked</span></div>
         <div style={{display:'flex',alignItems:'center',gap:'6px'}}><div style={{width:'24px',height:'14px',borderRadius:'3px',backgroundColor:'rgba(255,255,255,0.04)',border:'2px solid rgba(255,255,255,0.06)'}}/><span style={{color:MUTED,fontSize:'12px'}}>Available</span></div>
         <div style={{display:'flex',alignItems:'center',gap:'6px'}}><div style={{width:'24px',height:'14px',borderRadius:'3px',backgroundColor:'rgba(249,115,22,0.12)',border:'2px solid rgba(249,115,22,0.3)'}}/><span style={{color:MUTED,fontSize:'12px'}}>Rush hour</span></div>
@@ -92,8 +154,8 @@ export function AvailabilityGrid({profile,availability,schedules,nextMonday,curr
         const isWeekend=WEEKEND.includes(dayIndex)
         const dayBlocked=HOURS.filter(h=>blocked[dayIndex+'_'+h]).length
         return(
-          <div key={dayName} style={{backgroundColor:CARD,borderRadius:'14px',border:isWeekend?'1px solid rgba(255,99,87,0.2)':`1px solid ${BORDER}`,overflow:'hidden'}}>
-            <div style={{padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between',backgroundColor:isWeekend?'rgba(255,99,87,0.08)':'rgba(255,255,255,0.03)',borderBottom:`1px solid ${BORDER}`}}>
+          <div key={dayName} style={{backgroundColor:CARD,borderRadius:'14px',border:isWeekend?'1px solid rgba(255,99,87,0.2)':\`1px solid \${BORDER}\`,overflow:'hidden'}}>
+            <div style={{padding:'10px 14px',display:'flex',alignItems:'center',justifyContent:'space-between',backgroundColor:isWeekend?'rgba(255,99,87,0.08)':'rgba(255,255,255,0.03)',borderBottom:\`1px solid \${BORDER}\`}}>
               <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
                 <p style={{color:CREAM,fontSize:'14px',fontWeight:700}}>{dayName}</p>
                 <p style={{color:MUTED,fontSize:'11px'}}>{format(date,'MMM d')}</p>
@@ -123,7 +185,7 @@ export function AvailabilityGrid({profile,availability,schedules,nextMonday,curr
         )
       })}
 
-      <div style={{backgroundColor:CARD,borderRadius:'16px',border:`1px solid ${BORDER}`,padding:'16px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}}>
+      <div style={{backgroundColor:CARD,borderRadius:'16px',border:\`1px solid \${BORDER}\`,padding:'16px 20px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:'16px'}}>
         <div>
           <p style={{color:CREAM,fontSize:'14px',fontWeight:700}}>{blockedCount>0?blockedCount+' hours blocked':'All hours available this week'}</p>
           <p style={{color:MUTED,fontSize:'12px',marginTop:'2px'}}>Tap any hour to block it. Everything else is available for scheduling.</p>
@@ -139,4 +201,41 @@ export function AvailabilityGrid({profile,availability,schedules,nextMonday,curr
       </div>
     </div>
   )
+}`;
+
+  fs.writeFileSync("src/components/schedule/availability-grid.tsx", grid, "utf8");
+  console.log("availability-grid.tsx written");
+
+  // Update availability page
+  fs.writeFileSync("src/app/(dashboard)/availability/page.tsx", `import { createClient } from '@/lib/supabase-server'
+import { redirect } from 'next/navigation'
+import { AvailabilityGrid } from '@/components/schedule/availability-grid'
+import { getNextMonday, getCurrentWeekMonday } from '@/lib/utils'
+export default async function AvailabilityPage() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
+  if (!profile) redirect('/login')
+  const nextMonday = getNextMonday()
+  const currentMonday = getCurrentWeekMonday()
+  const [{ data: availability }, { data: rushConfig }, { data: schedules }] = await Promise.all([
+    supabase.from('availability').select('*').eq('staff_id', user.id).gte('week_starting', currentMonday),
+    supabase.from('rush_hour_config').select('*'),
+    supabase.from('schedules').select('*').gte('slot_date', currentMonday).or('supervisor_id.eq.'+user.id+',bar_staff_id.eq.'+user.id+',floor_staff1_id.eq.'+user.id+',floor_staff2_id.eq.'+user.id),
+  ])
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:'20px'}}>
+      <div>
+        <h1 style={{color:'#F7F0E8',fontSize:'22px',fontWeight:800,marginBottom:'4px'}}>My Availability</h1>
+        <p style={{color:'rgba(247,240,232,0.45)',fontSize:'13px'}}>Tap hours you cannot work. Everything else is available for scheduling.</p>
+      </div>
+      <AvailabilityGrid profile={profile} availability={availability||[]} schedules={schedules||[]} nextMonday={nextMonday} currentMonday={currentMonday} rushConfig={rushConfig||[]}/>
+    </div>
+  )
+}`);
+  console.log("availability/page.tsx written");
+  console.log("ALL DONE");
 }
+
+main().catch(console.error);

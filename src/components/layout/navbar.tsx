@@ -22,7 +22,7 @@ export function Navbar({ profile }: { profile: Profile }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const supabase = createClient()
-  const isAdmin = ['gm', 'admin', 'supervisor_floor', 'supervisor_bar'].includes(profile.role)
+  const isAdmin = ['gm', 'admin', 'supervisor'].includes(profile.role)
   const nav = NAV.filter(n => !n.adminOnly || isAdmin)
 
   const signOut = async () => {

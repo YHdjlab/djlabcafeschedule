@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 const ROLE_OPTIONS = [
   { value: 'floor', label: 'Floor Staff' },
   { value: 'bar', label: 'Bar Staff' },
-  { value: 'supervisor_floor', label: 'Supervisor (Floor)' },
-  { value: 'supervisor_bar', label: 'Supervisor (Bar)' },
+  { value: 'supervisor', label: 'Supervisor' },
+  { value: 'supervisor', label: 'Supervisor' },
   { value: 'admin', label: 'Admin' },
   { value: 'gm', label: 'General Manager' },
 ]
