@@ -206,11 +206,13 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
     for(const shift of SHIFTS){
       const covered=avail.filter(h=>h>=shift.s&&h<shift.e)
       if(covered.length<4)continue // need at least 4h overlap
-      // Score: rush coverage + overlap length
       const rushCovered=covered.filter(h=>h>=rushStartH&&h<rushEndH).length
       const score=covered.length+rushCovered*2
       if(score>bestScore){bestScore=score;bestShift=shift}
     }
+
+    // If staff is fully flexible (covers all shifts equally), prefer AM
+    if(bestShift&&avail.length>=14){bestShift={s:8,e:16}}
 
     if(!bestShift){
       // Fallback: find longest consecutive block up to 8h
