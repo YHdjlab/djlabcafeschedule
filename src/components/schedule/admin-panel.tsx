@@ -382,7 +382,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
                     const s=STAFF_MAP[member.id]
                     if(!s)return null
                     const info=member.info
-                    const rc={Supervisor:'#3B82F6',Bar:'#A855F7',Floor:'#22C55E',Available:'#636366'}[member.role]||'#636366'
+                    const rc=({Supervisor:'#3B82F6',Bar:'#A855F7',Floor:'#22C55E',Available:'#636366'} as any)[member.role]||'#636366'
                     const isFirstBench=member.role==='Available'&&idx>0&&slot.staff[idx-1]?.role!=='Available'
                     const fieldName=member.role==='Supervisor'?'supervisor_id':member.role==='Bar'?'bar_staff_id':member.id===slot.floor_staff1_id?'floor_staff1_id':'floor_staff2_id'
                     return(
