@@ -41,8 +41,8 @@ export default async function DashboardPage() {
   const isMyShiftToday = todaySchedule?.some((slot: any) => slot.supervisor_id === user.id || slot.bar_staff_id === user.id || slot.floor_staff1_id === user.id || slot.floor_staff2_id === user.id)
   const attendanceStatus = myAttendance ? (myAttendance.status === 'checked_in' ? 'checked_in' : myAttendance.status === 'checked_out' ? 'checked_out' : 'pending') : 'none'
   return (
-    <div className="space-y-5 max-w-5xl mx-auto">
-      <div className="relative overflow-hidden rounded-3xl bg-[#323232] p-6 lg:p-8">
+    <div style={{display:"flex",flexDirection:"column",gap:"20px"}}>
+      <div style={{position:"relative",overflow:"hidden",borderRadius:"20px",background:"linear-gradient(135deg,#2a2a2a,#1a1a1a)",padding:"28px 32px",border:"1px solid rgba(255,255,255,0.08)"}}>
         <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-[#FF6357] opacity-10 blur-3xl translate-x-1/2 -translate-y-1/2 pointer-events-none"/>
         <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-[#FF6357] opacity-10 blur-3xl -translate-x-1/2 translate-y-1/2 pointer-events-none"/>
         <div className="relative z-10 flex items-start justify-between gap-4">
@@ -70,8 +70,8 @@ export default async function DashboardPage() {
       </div>
 
       <div>
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3 px-1">Quick Actions</p>
-        <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+        <p style={{color:"rgba(247,240,232,0.35)",fontSize:"11px",fontWeight:600,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"12px"}}>Quick Actions</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(90px,1fr))",gap:"10px"}}>
           {[
             { href: '/schedule', icon: <Calendar size={20}/>, label: 'Schedule', bg: 'rgba(255,99,87,0.12)', color: '#FF6357' },
             { href: '/availability', icon: <Clock size={20}/>, label: 'Availability', bg: 'rgba(59,130,246,0.12)', color: '#3b82f6' },
@@ -89,17 +89,17 @@ export default async function DashboardPage() {
       </div>
 
       {isAdmin && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:"12px"}}>
           {[
-            { label: 'Active Staff', value: staffCount || 0, icon: <Users size={15}/>, color: 'text-blue-500', bg: 'bg-blue-50' },
-            { label: 'Swap Requests', value: pendingSwaps?.length || 0, icon: <ArrowLeftRight size={15}/>, color: 'text-purple-500', bg: 'bg-purple-50' },
-            { label: 'Days Off', value: pendingDaysOff?.length || 0, icon: <CalendarOff size={15}/>, color: 'text-green-500', bg: 'bg-green-50' },
-            { label: 'Punch-In Queue', value: pendingAttendance?.length || 0, icon: <CheckSquare size={15}/>, color: 'text-[#FF6357]', bg: 'bg-orange-50' },
+            { label: 'Active Staff', value: staffCount || 0, icon: <Users size={15}/>, color: '#3B82F6', bg: 'rgba(59,130,246,0.12)' },
+            { label: 'Swap Requests', value: pendingSwaps?.length || 0, icon: <ArrowLeftRight size={15}/>, color: '#A855F7', bg: 'rgba(168,85,247,0.12)' },
+            { label: 'Days Off', value: pendingDaysOff?.length || 0, icon: <CalendarOff size={15}/>, color: '#22C55E', bg: 'rgba(34,197,94,0.12)' },
+            { label: 'Punch-In Queue', value: pendingAttendance?.length || 0, icon: <CheckSquare size={15}/>, color: '#FF6357', bg: 'rgba(255,99,87,0.12)' },
           ].map(stat => (
             <div key={stat.label} style={{backgroundColor:'#242424',borderRadius:'14px',border:'1px solid rgba(255,255,255,0.08)',padding:'16px'}}>
               <div className="flex items-center justify-between mb-3">
                 <span style={{color:'rgba(247,240,232,0.4)',fontSize:'11px',fontWeight:500}}>{stat.label}</span>
-                <div className={`p-1.5 rounded-lg ${stat.bg} ${stat.color}`}>{stat.icon}</div>
+                <div style={{padding:"6px",borderRadius:"8px",backgroundColor:stat.bg,color:stat.color}}>{stat.icon}</div>
               </div>
               <p style={{color:'#F7F0E8',fontSize:'28px',fontWeight:800,lineHeight:1}}>{stat.value}</p>
             </div>
