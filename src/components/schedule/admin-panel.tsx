@@ -307,8 +307,8 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
       const getShiftForSup=(id:string,forceAM:boolean,forcePM:boolean)=>{
         const avail=getAvail(id)
         if(!avail.length)return null
-        if(forceAM){const hrs=avail.filter(h=>h>=8&&h<16);if(hrs.length)return{startH:hrs[0],endH:hrs[hrs.length-1]+1,totalH:hrs[hrs.length-1]+1-hrs[0],hours:hrs}}
-        if(forcePM){const hrs=avail.filter(h=>h>=16&&h<24);if(hrs.length)return{startH:hrs[0],endH:hrs[hrs.length-1]+1,totalH:hrs[hrs.length-1]+1-hrs[0],hours:hrs}}
+        if(forceAM){const hrs=avail.filter((h:number)=>h>=8&&h<16);if(hrs.length)return{startH:hrs[0],endH:hrs[hrs.length-1]+1,totalH:hrs[hrs.length-1]+1-hrs[0],hours:hrs}}
+        if(forcePM){const hrs=avail.filter((h:number)=>h>=16&&h<24);if(hrs.length)return{startH:hrs[0],endH:hrs[hrs.length-1]+1,totalH:hrs[hrs.length-1]+1-hrs[0],hours:hrs}}
         return getStaffHours(id,dateStr,rushStartH,rushEndH)
       }
       const bothFlexible=availSups.length>=2
