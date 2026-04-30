@@ -361,16 +361,26 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
         if(supervisor2_id)assignCount[supervisor2_id]=(assignCount[supervisor2_id]||0)+(sup2Info?.totalH||8)
       }
 
-const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==supervisor2_id))
-      const bar_staff_id=barPool[0]||null
+      // Score-based staff assignment - rush coverage is king
+      const scoreStaff=(id:string):number=>{
+        const avail=getAvail(id)
+        const supOverlap=(sup1Info?avail.filter((h:number)=>h>=sup1Info.startH&&h<sup1Info.endH).length:0)+(sup2Info?avail.filter((h:number)=>h>=sup2Info.startH&&h<sup2Info.endH).length:0)
+        const rush=avail.filter((h:number)=>h>=rushStartH&&h<rushEndH).length
+        const total=avail.length
+        const fair=-(assignCount[id]||0)
+        return rush*1000+total*100+supOverlap*10+fair
+      }
+      const excludedSet=new Set([supervisor_id,supervisor2_id].filter(Boolean))
+      const sortedPool=availStaff.filter((id:string)=>!excludedSet.has(id)).sort((a:string,b:string)=>scoreStaff(b)-scoreStaff(a))
+      console.log(day,'scores:',sortedPool.map((id:string)=>STAFF_MAP[id]?.full_name+':'+scoreStaff(id)))
+
+      const bar_staff_id=sortedPool[0]||null
       if(bar_staff_id)assignCount[bar_staff_id]=(assignCount[bar_staff_id]||0)+8
 
-      const floor1Pool=byLeast(availFloors.filter((id:string)=>id!==supervisor_id&&id!==supervisor2_id&&id!==bar_staff_id))
-      const floor_staff1_id=floor1Pool[0]||null
+      const floor_staff1_id=sortedPool[1]||null
       if(floor_staff1_id)assignCount[floor_staff1_id]=(assignCount[floor_staff1_id]||0)+8
 
-      const floor2Pool=byLeast(availFloors.filter((id:string)=>id!==supervisor_id&&id!==supervisor2_id&&id!==bar_staff_id&&id!==floor_staff1_id))
-      const floor_staff2_id=floor2Pool[0]||null
+      const floor_staff2_id=isWeekend?(sortedPool[2]||null):null
       if(floor_staff2_id)assignCount[floor_staff2_id]=(assignCount[floor_staff2_id]||0)+8
 
       const issues:string[]=[]
