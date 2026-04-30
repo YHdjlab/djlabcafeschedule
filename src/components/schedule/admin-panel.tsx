@@ -419,7 +419,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
           supervisor_id&&{id:supervisor_id,role:'Supervisor',info:sup1Info},
           supervisor2_id&&{id:supervisor2_id,role:'Supervisor',info:sup2Info},
           bar_staff_id&&{id:bar_staff_id,role:'Bar',info:getStaffHours(bar_staff_id,dateStr,rushStartH,rushEndH)},
-          floor_staff1_id&&{id:floor_staff1_id,role:'Floor',info:getStaffHours(floor_staff1_id,dateStr,rushStartH,rushEndH)},
+          floor_staff1_id&&{id:floor_staff1_id,role:'Floor',info:forcePMForFloor2(floor_staff1_id)||getStaffHours(floor_staff1_id,dateStr,rushStartH,rushEndH)},
           floor_staff2_id&&{id:floor_staff2_id,role:'Floor',info:forcePMForFloor2(floor_staff2_id)||getStaffHours(floor_staff2_id,dateStr,rushStartH,rushEndH)},
           ...benchStaff,
         ].filter(Boolean),
