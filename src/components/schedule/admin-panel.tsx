@@ -382,10 +382,11 @@ const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==sup
         key:day+'_day',date:dateStr,day,isWeekend,startH:dayStart,endH:dayEnd,
         supervisor_id,bar_staff_id,floor_staff1_id,floor_staff2_id,issues,rushStartH,rushEndH,fmtH,
         staff:[
-          supervisor_id&&{id:supervisor_id,role:'Supervisor',info:getStaffHours(supervisor_id, dateStr, rushStartH, rushEndH)},
-          bar_staff_id&&{id:bar_staff_id,role:'Bar',info:getStaffHours(bar_staff_id, dateStr, rushStartH, rushEndH)},
-          floor_staff1_id&&{id:floor_staff1_id,role:'Floor',info:getStaffHours(floor_staff1_id, dateStr, rushStartH, rushEndH)},
-          floor_staff2_id&&{id:floor_staff2_id,role:'Floor',info:getStaffHours(floor_staff2_id, dateStr, rushStartH, rushEndH)},
+          supervisor_id&&{id:supervisor_id,role:'Supervisor',info:sup1Info},
+          supervisor2_id&&{id:supervisor2_id,role:'Supervisor',info:sup2Info},
+          bar_staff_id&&{id:bar_staff_id,role:'Bar',info:getStaffHours(bar_staff_id,dateStr,rushStartH,rushEndH)},
+          floor_staff1_id&&{id:floor_staff1_id,role:'Floor',info:getStaffHours(floor_staff1_id,dateStr,rushStartH,rushEndH)},
+          floor_staff2_id&&{id:floor_staff2_id,role:'Floor',info:getStaffHours(floor_staff2_id,dateStr,rushStartH,rushEndH)},
           ...benchStaff,
         ].filter(Boolean),
       })
