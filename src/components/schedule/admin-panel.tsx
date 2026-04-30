@@ -201,8 +201,8 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
     if(!avail.length)return null
 
     // Try AM (8-16), MID (12-20), PM (16-24) - pick best fit
-    // Prefer shifts that align with opening (8) or closing (24)
-    const SHIFTS=[{s:8,e:16},{s:16,e:24},{s:8,e:14},{s:18,e:24},{s:12,e:20}]
+    // Default shift options - rush coverage will be the deciding score
+    const SHIFTS=[{s:16,e:24},{s:8,e:16},{s:12,e:20},{s:15,e:23},{s:18,e:24}]
     let bestShift=null
     let bestScore=-1
 
@@ -384,11 +384,22 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
       const floor_staff1_id=sortedPool[1]||null
       if(floor_staff1_id)assignCount[floor_staff1_id]=(assignCount[floor_staff1_id]||0)+8
 
-      // Rush hours always need 2 floor staff (1 sup + 1 bar + 2 floor)
-      // Off-rush hours only need 1 staff total
-      // Since the day spans both, we always assign 2 floor when a 3rd person is available
+      // Floor staff 2 - the 3rd person should DOUBLE UP during rush hours
+      // Pick whoever's best, but FORCE them to PM shift if they have evening availability
       const floor_staff2_id=sortedPool[2]||null
       if(floor_staff2_id)assignCount[floor_staff2_id]=(assignCount[floor_staff2_id]||0)+8
+
+      // Override floor_staff2 shift to PM if they have evening availability
+      // This creates the rush-hour double coverage
+      const forcePMForFloor2=(id:string|null)=>{
+        if(!id)return null
+        const avail=getAvail(id)
+        const eveningHours=avail.filter((h:number)=>h>=16&&h<=23)
+        if(eveningHours.length>=4){
+          return{startH:eveningHours[0],endH:eveningHours[eveningHours.length-1]+1,totalH:eveningHours[eveningHours.length-1]+1-eveningHours[0],hours:eveningHours}
+        }
+        return null
+      }
 
       const issues:string[]=[]
       if(!supervisor_id)issues.push('⚠️ No supervisor — shift cannot run')
@@ -409,7 +420,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
           supervisor2_id&&{id:supervisor2_id,role:'Supervisor',info:sup2Info},
           bar_staff_id&&{id:bar_staff_id,role:'Bar',info:getStaffHours(bar_staff_id,dateStr,rushStartH,rushEndH)},
           floor_staff1_id&&{id:floor_staff1_id,role:'Floor',info:getStaffHours(floor_staff1_id,dateStr,rushStartH,rushEndH)},
-          floor_staff2_id&&{id:floor_staff2_id,role:'Floor',info:getStaffHours(floor_staff2_id,dateStr,rushStartH,rushEndH)},
+          floor_staff2_id&&{id:floor_staff2_id,role:'Floor',info:forcePMForFloor2(floor_staff2_id)||getStaffHours(floor_staff2_id,dateStr,rushStartH,rushEndH)},
           ...benchStaff,
         ].filter(Boolean),
       })
