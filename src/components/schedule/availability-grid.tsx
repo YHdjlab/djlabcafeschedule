@@ -25,7 +25,7 @@ export function AvailabilityGrid({profile,availability,schedules,nextMonday,curr
     const map:Record<string,boolean>={}
     availability.forEach((a:any)=>{
       if(a.week_starting===weekStart&&!a.available){
-        const match=a.slot_key?.match(/_h(d+)$/)
+        const match=a.slot_key?.match(/_h(\d+)$/)
         if(match){
           const mon=new Date(weekStart+'T00:00:00')
           for(let d=0;d<7;d++){
