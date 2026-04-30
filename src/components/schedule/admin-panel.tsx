@@ -374,9 +374,9 @@ const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==sup
       if(floor_staff2_id)assignCount[floor_staff2_id]=(assignCount[floor_staff2_id]||0)+8
 
       const issues:string[]=[]
-      if(!supervisor_id)issues.push('No supervisor available')
-      if(!bar_staff_id)issues.push('No bar staff')
-      if(!floor_staff1_id)issues.push('No floor staff')
+      if(!supervisor_id)issues.push('⚠️ No supervisor — shift cannot run')
+      if(!bar_staff_id&&!floor_staff1_id)issues.push('No staff available')
+      if(isWeekend&&!floor_staff2_id&&floor_staff1_id)issues.push('Weekend needs 2nd staff for rush')
 
       const assignedIds=new Set([supervisor_id,supervisor2_id,bar_staff_id,floor_staff1_id,floor_staff2_id].filter(Boolean))
       const benchStaff=availStaff.filter(id=>!assignedIds.has(id)).map(id=>({id,role:'Available',info:getStaffHours(id, dateStr, rushStartH, rushEndH)}))
@@ -750,7 +750,7 @@ function SettingsTab({rushConfig,setRushConfig,profile,supabase}:any){
       </div>
       <div style={S.card}>
         <p style={{...S.title,marginBottom:'14px'}}>System Info</p>
-        {[['Off-Rush Staffing','1 supervisor + 1 bar + 1 floor'],['Rush Staffing','1 supervisor + 1 bar + 2 floor'],['Swap Cutoff','2 hours before shift'],['Schedule Approval','GM required']].map(([label,value])=>(
+        {[['Off-Rush Staffing','1 supervisor + 1 staff (cost efficient)'],['Rush Staffing','1 supervisor + 1 bar + 2 floor (weekends/rush)'],['Swap Cutoff','2 hours before shift'],['Schedule Approval','GM required']].map(([label,value])=>(
           <div key={label} style={{...S.row,marginBottom:'6px'}}>
             <span style={{color:MUTED,fontSize:'13px'}}>{label}</span>
             <span style={{color:CREAM,fontSize:'13px',fontWeight:600}}>{value}</span>
