@@ -648,7 +648,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
           <p style={{color:MUTED,fontSize:'12px',marginBottom:'18px'}}>Red blocks = staff cannot work. Click any block to view details.</p>
           {activeStaff.map((s:any)=>{
             const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-            const DATES=Array.from({length:7},(_,i)=>{const d=new Date(weekStart+'T00:00:00');d.setDate(d.getDate()+i);return d.toISOString().slice(0,10)})
+            const DATES=Array.from({length:7},(_,i)=>format(addDays(new Date(weekStart+'T00:00:00'),i),'yyyy-MM-dd'))
             const totalBlocked=DATES.reduce((sum:number,date:string)=>{
               return sum+weekAvailability.filter((a:any)=>a.staff_id===s.id&&a.slot_date===date).length<16?16-weekAvailability.filter((a:any)=>a.staff_id===s.id&&a.slot_date===date).length:0
             },0)
