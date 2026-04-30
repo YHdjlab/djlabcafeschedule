@@ -178,6 +178,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
   const [generating,setGenerating]=useState(false)
   const [saving,setSaving]=useState(false)
   const [generatedSlots,setGeneratedSlots]=useState<any[]>([])
+  const [editingHours,setEditingHours]=useState<string|null>(null) // key = slotKey_memberId
   const isGM=['gm','supervisor'].includes(profile.role)
   const activeStaff=staff.filter((s:any)=>s.active&&s.role!=='gm')
   const STAFF_MAP:Record<string,any>={}
@@ -531,7 +532,13 @@ const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==sup
                             </div>
                             <p style={{color:CREAM,fontSize:'13px',fontWeight:600,flex:1,minWidth:0}}>{s.full_name?.split(' ')[0]}</p>
                             <span style={{backgroundColor:rc+'20',color:rc,fontSize:'11px',fontWeight:700,padding:'3px 10px',borderRadius:'20px'}}>{member.role.toUpperCase()}</span>
-                            {info&&<span style={{color:CORAL,fontSize:'12px',fontWeight:700}}>{info.totalH}h</span>}
+                            {info&&(
+                              <span
+                                onClick={()=>setEditingHours(editingHours===slot.key+'_'+member.id?null:slot.key+'_'+member.id)}
+                                style={{color:CORAL,fontSize:'12px',fontWeight:700,cursor:'pointer',textDecoration:'underline',textDecorationStyle:'dotted'}}
+                                title="Click to edit hours"
+                              >{info.totalH}h ✎</span>
+                            )}
                             {member.role==='Available'&&(
                               <select value="" onChange={e=>{
                                 if(!e.target.value)return
@@ -556,6 +563,29 @@ const barPool=byLeast(availBars.filter((id:string)=>id!==supervisor_id&&id!==sup
                               <button onClick={()=>setGeneratedSlots(prev=>prev.map(gs=>gs.key!==slot.key?gs:{...gs,[fieldName]:null,staff:gs.staff.map((m:any)=>m.id===member.id?{...m,role:'Available'}:m)}))} style={{width:'24px',height:'24px',borderRadius:'50%',backgroundColor:'rgba(239,68,68,0.1)',color:'#ef4444',border:'none',cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'12px',fontWeight:700,flexShrink:0}}>✕</button>
                             )}
                           </div>
+                          {editingHours===slot.key+'_'+member.id&&info&&(
+                            <div style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 0 4px',flexWrap:'wrap'}}>
+                              <span style={{color:MUTED,fontSize:'11px',fontWeight:600}}>Start:</span>
+                              <select value={info.startH} onChange={e=>{
+                                const newStart=parseInt(e.target.value)
+                                setGeneratedSlots((prev:any[])=>prev.map((gs:any)=>gs.key!==slot.key?gs:{...gs,staff:gs.staff.map((m:any)=>m.id!==member.id?m:{...m,info:{...m.info,startH:newStart,totalH:m.info.endH-newStart}})}))
+                              }} style={{backgroundColor:'#2e2e2e',color:CREAM,border:'1px solid rgba(255,255,255,0.15)',borderRadius:'6px',padding:'3px 6px',fontSize:'12px',cursor:'pointer'}}>
+                                {Array.from({length:16},(_,i)=>i+8).map(h=>(
+                                  <option key={h} value={h}>{h===12?'12pm':h<12?h+'am':(h-12)+'pm'}</option>
+                                ))}
+                              </select>
+                              <span style={{color:MUTED,fontSize:'11px',fontWeight:600}}>End:</span>
+                              <select value={info.endH} onChange={e=>{
+                                const newEnd=parseInt(e.target.value)
+                                setGeneratedSlots((prev:any[])=>prev.map((gs:any)=>gs.key!==slot.key?gs:{...gs,staff:gs.staff.map((m:any)=>m.id!==member.id?m:{...m,info:{...m.info,endH:newEnd,totalH:newEnd-m.info.startH}})}))
+                              }} style={{backgroundColor:'#2e2e2e',color:CREAM,border:'1px solid rgba(255,255,255,0.15)',borderRadius:'6px',padding:'3px 6px',fontSize:'12px',cursor:'pointer'}}>
+                                {Array.from({length:16},(_,i)=>i+9).map(h=>(
+                                  <option key={h} value={h}>{h===12?'12pm':h===24?'12am':h<12?h+'am':(h-12)+'pm'}</option>
+                                ))}
+                              </select>
+                              <button onClick={()=>setEditingHours(null)} style={{color:MUTED,fontSize:'11px',background:'none',border:'none',cursor:'pointer'}}>✓ done</button>
+                            </div>
+                          )}
                           {info&&(
                             <div>
                               <div style={{position:'relative',height:'18px',borderRadius:'20px',backgroundColor:'rgba(255,255,255,0.06)',overflow:'hidden'}}>
