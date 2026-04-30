@@ -368,9 +368,11 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
         const avail=getAvail(id)
         const supOverlap=(sup1Info?avail.filter((h:number)=>h>=sup1Info.startH&&h<sup1Info.endH).length:0)+(sup2Info?avail.filter((h:number)=>h>=sup2Info.startH&&h<sup2Info.endH).length:0)
         const rush=avail.filter((h:number)=>h>=rushStartH&&h<rushEndH).length
+        // Closing coverage - staff available till midnight is valuable for PM shift
+        const closingHours=avail.filter((h:number)=>h>=21&&h<24).length
         const total=avail.length
         const fair=-(assignCount[id]||0)
-        return rush*1000+total*100+supOverlap*10+fair
+        return rush*1000+closingHours*200+total*100+supOverlap*10+fair
       }
       const excludedSet=new Set([supervisor_id,supervisor2_id].filter(Boolean))
       const sortedPool=availStaff.filter((id:string)=>!excludedSet.has(id)).sort((a:string,b:string)=>scoreStaff(b)-scoreStaff(a))
