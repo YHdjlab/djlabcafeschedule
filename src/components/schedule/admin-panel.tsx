@@ -201,7 +201,8 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
     if(!avail.length)return null
 
     // Try AM (8-16), MID (12-20), PM (16-24) - pick best fit
-    const SHIFTS=[{s:8,e:16},{s:12,e:20},{s:15,e:23},{s:16,e:24}]
+    // Prefer shifts that align with opening (8) or closing (24)
+    const SHIFTS=[{s:8,e:16},{s:16,e:24},{s:8,e:14},{s:18,e:24},{s:12,e:20}]
     let bestShift=null
     let bestScore=-1
 
@@ -381,7 +382,15 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
       const floor_staff1_id=sortedPool[1]||null
       if(floor_staff1_id)assignCount[floor_staff1_id]=(assignCount[floor_staff1_id]||0)+8
 
-      const floor_staff2_id=isWeekend?(sortedPool[2]||null):null
+      // Add 2nd floor staff if:
+      // - Weekend (full rush)
+      // - OR there's a 3rd person available who covers rush hours significantly
+      const thirdPerson=sortedPool[2]
+      const thirdCoversRush=thirdPerson?(()=>{
+        const av=getAvail(thirdPerson)
+        return av.filter((h:number)=>h>=rushStartH&&h<rushEndH).length>=3
+      })():false
+      const floor_staff2_id=isWeekend?(sortedPool[2]||null):(thirdCoversRush?thirdPerson:null)
       if(floor_staff2_id)assignCount[floor_staff2_id]=(assignCount[floor_staff2_id]||0)+8
 
       const issues:string[]=[]
