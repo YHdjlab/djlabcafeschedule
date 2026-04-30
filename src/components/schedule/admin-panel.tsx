@@ -200,7 +200,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
     if(!avail.length)return null
 
     // Try AM (8-16), MID (12-20), PM (16-24) - pick best fit
-    const SHIFTS=[{s:8,e:16},{s:12,e:20},{s:16,e:24}]
+    const SHIFTS=[{s:8,e:16},{s:12,e:20},{s:15,e:23},{s:16,e:24}]
     let bestShift=null
     let bestScore=-1
 
