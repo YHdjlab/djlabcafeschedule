@@ -382,15 +382,10 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
       const floor_staff1_id=sortedPool[1]||null
       if(floor_staff1_id)assignCount[floor_staff1_id]=(assignCount[floor_staff1_id]||0)+8
 
-      // Add 2nd floor staff if:
-      // - Weekend (full rush)
-      // - OR there's a 3rd person available who covers rush hours significantly
-      const thirdPerson=sortedPool[2]
-      const thirdCoversRush=thirdPerson?(()=>{
-        const av=getAvail(thirdPerson)
-        return av.filter((h:number)=>h>=rushStartH&&h<rushEndH).length>=3
-      })():false
-      const floor_staff2_id=isWeekend?(sortedPool[2]||null):(thirdCoversRush?thirdPerson:null)
+      // Rush hours always need 2 floor staff (1 sup + 1 bar + 2 floor)
+      // Off-rush hours only need 1 staff total
+      // Since the day spans both, we always assign 2 floor when a 3rd person is available
+      const floor_staff2_id=sortedPool[2]||null
       if(floor_staff2_id)assignCount[floor_staff2_id]=(assignCount[floor_staff2_id]||0)+8
 
       const issues:string[]=[]
@@ -828,7 +823,7 @@ function SettingsTab({rushConfig,setRushConfig,profile,supabase}:any){
       </div>
       <div style={S.card}>
         <p style={{...S.title,marginBottom:'14px'}}>System Info</p>
-        {[['Off-Rush Staffing','1 supervisor + 1 staff (cost efficient)'],['Rush Staffing','1 supervisor + 1 bar + 2 floor (weekends/rush)'],['Swap Cutoff','2 hours before shift'],['Schedule Approval','GM required']].map(([label,value])=>(
+        {[['Off-Rush Staffing','1 supervisor + 1 bar + 1 floor'],['Rush Staffing','1 supervisor + 1 bar + 2 floor (preferred)'],['Swap Cutoff','2 hours before shift'],['Schedule Approval','GM required']].map(([label,value])=>(
           <div key={label} style={{...S.row,marginBottom:'6px'}}>
             <span style={{color:MUTED,fontSize:'13px'}}>{label}</span>
             <span style={{color:CREAM,fontSize:'13px',fontWeight:600}}>{value}</span>
