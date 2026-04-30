@@ -653,9 +653,6 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
               return sum+weekAvailability.filter((a:any)=>a.staff_id===s.id&&a.slot_date===date).length<16?16-weekAvailability.filter((a:any)=>a.staff_id===s.id&&a.slot_date===date).length:0
             },0)
             const allWeekAvail=availability.filter((a:any)=>a.staff_id===s.id&&a.week_starting===weekStart)
-            if(s.full_name?.includes('Cynthia')){
-              console.log('Cynthia avail rows:', allWeekAvail.length, 'blocked:', allWeekAvail.filter((a:any)=>!a.available).map((a:any)=>a.slot_date+' '+a.slot_key))
-            }
             const blockedHours=allWeekAvail.filter((a:any)=>!a.available).length
             const totalHoursBlocked=blockedHours
             return(
