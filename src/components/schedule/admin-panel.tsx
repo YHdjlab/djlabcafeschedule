@@ -352,6 +352,11 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
           }
         }
 
+        // Close any gap between sup1 end and sup2 start by extending sup1
+        if(sup1Info&&sup2Info&&sup2Info.startH>sup1Info.endH){
+          sup1Info={...sup1Info,endH:sup2Info.startH,totalH:sup2Info.startH-sup1Info.startH}
+        }
+        // Close any gap between sup2 end and midnight by checking if day ends after sup2
         if(supervisor_id)assignCount[supervisor_id]=(assignCount[supervisor_id]||0)+(sup1Info?.totalH||8)
         if(supervisor2_id)assignCount[supervisor2_id]=(assignCount[supervisor2_id]||0)+(sup2Info?.totalH||8)
       }
