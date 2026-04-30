@@ -771,11 +771,15 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
                                 if(!e.target.value)return
                                 const ar=e.target.value
                                 const fm:Record<string,string>={Supervisor:'supervisor_id',Bar:'bar_staff_id',Floor1:'floor_staff1_id',Floor2:'floor_staff2_id'}
-                                const fld=fm[ar];if(!fld)return
                                 setGeneratedSlots((prev:any[])=>prev.map((gs:any)=>{
                                   if(gs.key!==slot.key)return gs
-                                  const newRole=ar==='Floor1'||ar==='Floor2'?'Floor':ar
+                                  const newRole=ar==='Floor1'||ar==='Floor2'||ar==='Extra'?'Floor':ar
                                   const newStaff=gs.staff.map((m:any)=>m.id===member.id?{...m,role:newRole,info:getStaffHours(m.id,gs.date,gs.rushStartH,gs.rushEndH)}:m)
+                                  if(ar==='Extra'){
+                                    // Add as extra - just change role to Floor, no field update
+                                    return{...gs,staff:newStaff,extra_staff:[...(gs.extra_staff||[]),member.id]}
+                                  }
+                                  const fld=fm[ar];if(!fld)return gs
                                   return{...gs,[fld]:member.id,staff:newStaff}
                                 }))
                               }} style={{backgroundColor:CORAL+'20',color:CORAL,border:`1px solid ${CORAL}40`,borderRadius:'8px',padding:'4px 8px',fontSize:'11px',fontWeight:700,cursor:'pointer'}}>
@@ -784,6 +788,7 @@ function ScheduleBuilderTab({staff,schedules,setSchedules,profile,supabase,avail
                                 {!slot.bar_staff_id&&<option value="Bar">As Bar</option>}
                                 {!slot.floor_staff1_id&&<option value="Floor1">As Floor</option>}
                                 {slot.floor_staff1_id&&!slot.floor_staff2_id&&<option value="Floor2">As 2nd Floor</option>}
+                                {slot.floor_staff1_id&&slot.floor_staff2_id&&<option value="Extra">As Extra Staff</option>}
                               </select>
                             )}
                             {member.role!=='Available'&&(
